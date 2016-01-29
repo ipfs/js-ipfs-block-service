@@ -1,0 +1,45 @@
+{
+  "name": "ipfs-blocks",
+  "version": "0.0.0",
+  "description": "JavaScript Implementation of Block and BlockService",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node tests/index.js",
+    "lint": "standard"
+  },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ipfs/js-ipfs-blocks.git"
+  },
+  "keywords": [
+    "IPFS"
+  ],
+  "authors": [
+    "David Dias <daviddias@ipfs.io>",
+    "Vijayee Kulkaa <vijayee.kulkaa@hushmail.com"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ipfs/js-ipfs-blocks/issues"
+  },
+  "homepage": "https://github.com/ipfs/js-ipfs-blocks#readme",
+  "devDependencies": {
+    "async": "^1.5.2",
+    "bs58": "^3.0.0",
+    "fs-blob-store": "^5.2.1",
+    "ipfs-repo": "^0.3.0",
+    "ncp": "^2.0.0",
+    "pre-commit": "^1.1.2",
+    "rimraf": "^2.5.1",
+    "standard": "^5.4.1",
+    "tape": "^4.4.0"
+  },
+  "dependencies": {
+    "bl": "^1.0.1",
+    "multihashing": "^0.2.0"
+  }
+}
