@@ -1,37 +1,43 @@
-var test = require('tape')
-var Block = require('../src').Block
+/* globals describe, it */
 
-test('block: \t\t create a new block', function (t) {
-  var b = new Block('random-data')
-  t.ok(b.key, 'block has key')
-  t.ok(b.data, 'block has data')
-  t.end()
-})
+'use strict'
 
-test('block: \t\t fail to create an empty block', function (t) {
-  var b
-  try {
-    b = new Block()
-  } catch (err) {
-    t.is(b, undefined, 'block was not created')
-    t.end()
-  }
-})
+const expect = require('chai').expect
+const Block = require('../src').Block
 
-test('block: \t\t 2 different blocks have different hashes', function (t) {
-  var b1 = new Block('random-data')
-  var b2 = new Block('more-random-data')
-  t.notDeepEqual(b1, b2)
-  t.end()
-})
+describe('block', function () {
+  it('block: \t\t create a new block', function (done) {
+    var b = new Block('random-data')
+    expect(b.key).to.exist
+    expect(b.data).to.exist
+    done()
+  })
 
-test.skip('block: \t\t block stays immutable', function (t) {
-  // Test from the original implementation
-  // It doesn't stricly verify the immutability of the Block object
-  var block = new Block("Can't change this!")
-  var key = block.key
-  key = new Buffer('new key')
+  it('fail to create an empty block', function (done) {
+    var b
+    try {
+      b = new Block()
+    } catch (err) {
+      expect(b).to.not.exist
+      done()
+    }
+  })
 
-  t.is(key.equals(block.key), false)
-  t.end()
+  it('2 different blocks have different hashes', function (done) {
+    var b1 = new Block('random-data')
+    var b2 = new Block('more-random-data')
+    expect(b1).to.not.deep.equal(b2)
+    done()
+  })
+
+  it.skip('block stays immutable', function (done) {
+    // it from the original implementation
+    // It doesn't stricly verify the immutability of the Block object
+    var block = new Block("Can't change this!")
+    var key = block.key
+    key = new Buffer('new key')
+
+    expect(key.equals(block.key)).to.equal(false)
+    done()
+  })
 })

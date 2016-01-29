@@ -1,88 +1,95 @@
-var test = require('tape')
-var Block = require('../src').Block
-var BlockService = require('../src').BlockService
+/* globals describe, it */
 
-var IPFSRepo = require('ipfs-repo')
-var bs
+'use strict'
 
-test('block-service: \t create a block-service', function (t) {
-  var repo = new IPFSRepo(require('./index.js').repoPath)
-  bs = new BlockService(repo)
-  t.ok(bs, 'block service successfully created')
-  t.end()
-})
+const expect = require('chai').expect
+const Block = require('../src').Block
+const BlockService = require('../src').BlockService
 
-test('block-service: \t store a block', function (t) {
-  var b = new Block('A random data block')
-  bs.addBlock(b, function (err) {
-    t.ifError(err)
-    bs.getBlock(b.key, function (err, block) {
-      t.ifError(err)
-      t.ok(b.data.equals(block.data), 'Stored block data correctly')
-      t.ok(b.key.equals(block.key), 'Stored block key correctly')
-      t.end()
-    })
+const IPFSRepo = require('ipfs-repo')
+
+describe('block-service', function () {
+  var bs
+
+  it('create a block-service', function (done) {
+    var repo = new IPFSRepo(process.env.IPFS_PATH)
+    bs = new BlockService(repo)
+    expect(bs).to.exist
+    done()
   })
-})
 
-test('block-service: \t get a non existent block', function (t) {
-  var b = new Block('Not stored')
-  bs.getBlock(b.key, function (err, block) {
-    t.ifError(!err)
-    t.end()
-  })
-})
-
-test('block-service: \t store many blocks', function (t) {
-  var b1 = new Block('1')
-  var b2 = new Block('2')
-  var b3 = new Block('3')
-
-  var blocks = []
-  blocks.push(b1)
-  blocks.push(b2)
-  blocks.push(b3)
-
-  bs.addBlocks(blocks, function (err) {
-    t.ifError(err, 'stored successfully')
-    t.end()
-  })
-})
-
-test('block-service: \t delete a block', function (t) {
-  var b = new Block('Will not live that much')
-  bs.addBlock(b, function (err) {
-    t.ifError(err)
-    bs.deleteBlock(b.key, function (err) {
-      t.ifError(err)
+  it('store a block', function (done) {
+    var b = new Block('A random data block')
+    bs.addBlock(b, function (err) {
+      expect(err).to.not.exist
       bs.getBlock(b.key, function (err, block) {
-        t.ifError(!err)
-        t.end()
+        expect(err).to.not.exist
+        expect(b.data.equals(block.data)).to.equal(true)
+        expect(b.key.equals(block.key)).to.equal(true)
+        done()
       })
     })
   })
-})
 
-test('block-service: \t delete a non existent block', function (t) {
-  var b = new Block('I do not exist')
-  bs.deleteBlock(b.key, function (err) {
-    t.ifError(err)
-    t.end()
+  it('get a non existent block', function (done) {
+    var b = new Block('Not stored')
+    bs.getBlock(b.key, function (err, block) {
+      expect(err).to.exist
+      done()
+    })
   })
-})
 
-test('block-service: \t delete many blocks', function (t) {
-  var b1 = new Block('1')
-  var b2 = new Block('2')
-  var b3 = new Block('3')
+  it('store many blocks', function (done) {
+    var b1 = new Block('1')
+    var b2 = new Block('2')
+    var b3 = new Block('3')
 
-  var blocks = []
-  blocks.push(b1.key)
-  blocks.push(b2.key)
-  blocks.push(b3.key)
+    var blocks = []
+    blocks.push(b1)
+    blocks.push(b2)
+    blocks.push(b3)
 
-  bs.deleteBlocks(blocks, function (err) {
-    t.ifError(err, 'stored successfully')
-    t.end()
+    bs.addBlocks(blocks, function (err) {
+      expect(err).to.not.exist
+      done()
+    })
+  })
+
+  it('delete a block', function (done) {
+    var b = new Block('Will not live that much')
+    bs.addBlock(b, function (err) {
+      expect(err).to.not.exist
+      bs.deleteBlock(b.key, function (err) {
+        expect(err).to.not.exist
+        bs.getBlock(b.key, function (err, block) {
+          expect(err).to.exist
+          done()
+        })
+      })
+    })
+  })
+
+  it('block-service: \t delete a non existent block', function (done) {
+    var b = new Block('I do not exist')
+    bs.deleteBlock(b.key, function (err) {
+      expect(err).to.not.exist
+      done()
+    })
+  })
+
+  it('block-service: \t delete many blocks', function (done) {
+    var b1 = new Block('1')
+    var b2 = new Block('2')
+    var b3 = new Block('3')
+
+    var blocks = []
+    blocks.push(b1.key)
+    blocks.push(b2.key)
+    blocks.push(b3.key)
+
+    bs.deleteBlocks(blocks, function (err) {
+      expect(err).to.not.exist
+      done()
+    })
   })
 })
