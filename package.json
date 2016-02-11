@@ -28,7 +28,6 @@
   },
   "homepage": "https://github.com/ipfs/js-ipfs-blocks#readme",
   "devDependencies": {
-    "async": "^1.5.2",
     "bs58": "^3.0.0",
     "chai": "^3.5.0",
     "fs-blob-store": "^5.2.1",
@@ -40,6 +39,7 @@
     "standard": "^5.4.1"
   },
   "dependencies": {
+    "async": "^1.5.2",
     "bl": "^1.0.1",
     "multihashing": "^0.2.0"
   }
