@@ -34,7 +34,7 @@
   "devDependencies": {
     "bs58": "^3.0.0",
     "chai": "^3.5.0",
-    "dignified.js": "github:dignifiedquire/dignified.js",
+    "dignified.js": "^1.0.0",
     "fs-blob-store": "^5.2.1",
     "ipfs-repo": "^0.3.0",
     "ncp": "^2.0.0",
