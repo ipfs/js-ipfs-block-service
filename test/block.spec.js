@@ -5,31 +5,24 @@ const expect = require('chai').expect
 const Block = require('../src').Block
 
 describe('block', () => {
-  it('block: \t\t create a new block', (done) => {
+  it('create', () => {
     const b = new Block('random-data')
     expect(b.key).to.exist
     expect(b.data).to.exist
-    done()
+    expect(b.extension).to.be.eql('data')
   })
 
-  it('fail to create an empty block', (done) => {
-    let b
-    try {
-      b = new Block()
-    } catch (err) {
-      expect(b).to.not.exist
-      done()
-    }
+  it('fail to create an empty block', () => {
+    expect(() => new Block).to.throw()
   })
 
-  it('2 different blocks have different hashes', (done) => {
+  it('2 different blocks have different hashes', () => {
     const b1 = new Block('random-data')
     const b2 = new Block('more-random-data')
     expect(b1).to.not.deep.equal(b2)
-    done()
   })
 
-  it.skip('block stays immutable', (done) => {
+  it.skip('block stays immutable', () => {
     // it from the original implementation
     // It doesn't stricly verify the immutability of the Block object
     const block = new Block("Can't change this!")
@@ -37,6 +30,5 @@ describe('block', () => {
     key = new Buffer('new key')
 
     expect(key.equals(block.key)).to.equal(false)
-    done()
   })
 })

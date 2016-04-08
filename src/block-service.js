@@ -9,9 +9,9 @@ const async = require('async')
 // It uses an internal `datastore.Datastore` instance to store values.
 function BlockService (ipfsRepo, exchange) {
   this.addBlock = (block, callback) => {
-    const ws = ipfsRepo.datastore.createWriteStream(block.key)
+    const ws = ipfsRepo.datastore.createWriteStream(block.key, block.extension)
     ws.write(block.data)
-    ws.on('finish', callback)
+    ws.once('finish', callback)
     ws.end()
   }
 
@@ -22,32 +22,40 @@ function BlockService (ipfsRepo, exchange) {
 
     async.each(blocks, (block, next) => {
       this.addBlock(block, next)
-    }, (err) => {
-      callback(err)
-    })
+    }, callback)
   }
 
-  this.getBlock = (multihash, callback) => {
+  this.getBlock = (multihash, extension, callback) => {
     if (!multihash) {
       return callback(new Error('Invalid multihash'))
     }
 
-    ipfsRepo.datastore.createReadStream(multihash)
+    if (typeof extension === 'function') {
+      callback = extension
+      extension = undefined
+    }
+
+    ipfsRepo.datastore.createReadStream(multihash, extension)
       .pipe(bl((err, data) => {
         if (err) { return callback(err) }
-        callback(null, new Block(data))
+        callback(null, new Block(data, extension))
       }))
   }
 
-  this.getBlocks = (multihashes, callback) => {
+  this.getBlocks = (multihashes, extension, callback) => {
     if (!Array.isArray(multihashes)) {
       return callback(new Error('Invalid batch of multihashes'))
+    }
+
+    if (typeof extension === 'function') {
+      callback = extension
+      extension = undefined
     }
 
     const blocks = []
 
     async.each(multihashes, (multihash, next) => {
-      this.getBlock(multihash, (err, block) => {
+      this.getBlock(multihash, extension, (err, block) => {
         if (err) { return next(err) }
         blocks.push(block)
       })
@@ -56,21 +64,31 @@ function BlockService (ipfsRepo, exchange) {
     })
   }
 
-  this.deleteBlock = (multihash, callback) => {
+  this.deleteBlock = (multihash, extension, callback) => {
     if (!multihash) {
       return callback(new Error('Invalid multihash'))
     }
 
-    ipfsRepo.datastore.remove(multihash, callback)
+    if (typeof extension === 'function') {
+      callback = extension
+      extension = undefined
+    }
+
+    ipfsRepo.datastore.remove(multihash, extension, callback)
   }
 
-  this.deleteBlocks = (multihashes, callback) => {
+  this.deleteBlocks = (multihashes, extension, callback) => {
     if (!Array.isArray(multihashes)) {
       return callback('Invalid batch of multihashes')
     }
 
+    if (typeof extension === 'function') {
+      callback = extension
+      extension = undefined
+    }
+
     async.each(multihashes, (multihash, next) => {
-      this.deleteBlock(multihash, next)
+      this.deleteBlock(multihash, extension, next)
     }, (err) => {
       callback(err)
     })
