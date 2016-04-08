@@ -1,15 +1,15 @@
+'use strict'
+
 const Block = require('./block')
 const bl = require('bl')
 const async = require('async')
-
-module.exports = BlockService
 
 // BlockService is a hybrid block datastore. It stores data in a local
 // datastore and may retrieve data from a remote Exchange.
 // It uses an internal `datastore.Datastore` instance to store values.
 function BlockService (ipfsRepo, exchange) {
   this.addBlock = (block, callback) => {
-    var ws = ipfsRepo.datastore.createWriteStream(block.key)
+    const ws = ipfsRepo.datastore.createWriteStream(block.key)
     ws.write(block.data)
     ws.on('finish', callback)
     ws.end()
@@ -44,7 +44,7 @@ function BlockService (ipfsRepo, exchange) {
       return callback(new Error('Invalid batch of multihashes'))
     }
 
-    var blocks = []
+    const blocks = []
 
     async.each(multihashes, (multihash, next) => {
       this.getBlock(multihash, (err, block) => {
@@ -77,3 +77,4 @@ function BlockService (ipfsRepo, exchange) {
   }
 }
 
+module.exports = BlockService

@@ -1,5 +1,4 @@
-/* globals describe, it */
-
+/* eslint-env mocha */
 'use strict'
 
 const expect = require('chai').expect
@@ -14,7 +13,7 @@ describe('block', () => {
   })
 
   it('fail to create an empty block', (done) => {
-    var b
+    let b
     try {
       b = new Block()
     } catch (err) {
@@ -34,7 +33,7 @@ describe('block', () => {
     // it from the original implementation
     // It doesn't stricly verify the immutability of the Block object
     const block = new Block("Can't change this!")
-    var key = block.key
+    let key = block.key
     key = new Buffer('new key')
 
     expect(key.equals(block.key)).to.equal(false)

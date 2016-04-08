@@ -1,5 +1,4 @@
-/* globals describe, it */
-
+/* eslint-env mocha */
 'use strict'
 
 const expect = require('chai').expect
@@ -9,7 +8,7 @@ const BlockService = require('../src').BlockService
 const IPFSRepo = require('ipfs-repo')
 
 describe('block-service', () => {
-  var bs
+  let bs
 
   it('create a block-service', (done) => {
     const repo = new IPFSRepo(process.env.IPFS_PATH)
