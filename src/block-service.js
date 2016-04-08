@@ -1,4 +1,5 @@
 'use strict'
+
 const Block = require('./block')
 const bl = require('bl')
 const async = require('async')

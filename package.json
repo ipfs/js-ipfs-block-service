@@ -9,7 +9,8 @@
     "test": "dignified-test",
     "test:node": "dignified-test node",
     "test:browser": "dignified-test browser",
-    "release": "dignified-release"
+    "release": "dignified-release",
+    "coverage": "dignified-coverage"
   },
   "pre-commit": [
     "lint",
