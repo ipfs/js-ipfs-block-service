@@ -13,7 +13,7 @@ describe('block', () => {
   })
 
   it('fail to create an empty block', () => {
-    expect(() => new Block).to.throw()
+    expect(() => new Block()).to.throw()
   })
 
   it('2 different blocks have different hashes', () => {
