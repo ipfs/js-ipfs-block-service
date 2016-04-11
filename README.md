@@ -1,7 +1,7 @@
 IPFS Blocks JavaScript Implementation
 =====================================
 
-[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io) 
+[![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
 [![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
 [![Travis CI](https://travis-ci.org/ipfs/js-ipfs-blocks.svg?branch=master)](https://travis-ci.org/ipfs/js-ipfs-blocks)
@@ -40,8 +40,8 @@ A Block is a data structure available on this module.
 
 ## Use in Node.js
 
-```JavaScript
-var ipfsBlocks = require('ipfs-blocks')
+```js
+const ipfsBlocks = require('ipfs-blocks')
 ```
 
 ## Use in a browser with browserify, webpack or any other bundler
@@ -65,7 +65,7 @@ Loading this module through a script tag will make the `Unixfs` obj available in
 # Usage
 
 
-```javascript
+```js
 // then, to access each of the components
 ipfsBlocks.BlockService
 ipfsBlocks.Block
@@ -75,25 +75,34 @@ ipfsBlocks.Block
 
 Create a new block
 
-```JavaScript
-var block = new blocks.Block('some data')
-console.log(block.data) 
+```js
+const block = new blocks.Block('some data')
+console.log(block.data)
 // It will print 'some data'
+
 console.log(block.key)
 // It will print the sha256 multihash of 'some data'
+```
+
+A block can also have it's own extension, which by default is `data`.
+
+```js
+const block = new blocks.Block('data', 'ipld')
+console.log(block.extension)
+// => ipld
 ```
 
 #### BlockService
 
 Create a new block service
 
-```JavaScript
-var bs = new ipfsBlocks.BlockService(<IPFS REPO instance> [, <IPFS Exchange>])
+```js
+const bs = new ipfsBlocks.BlockService(<IPFS REPO instance> [, <IPFS Exchange>])
 ```
 
-##### addBlock
+##### `addBlock`
 
-```JavaScript
+```js
 bs.addBlock(block, function (err) {
   if (!err) {
     // block successfuly added
@@ -101,9 +110,9 @@ bs.addBlock(block, function (err) {
 })
 ```
 
-##### addBlocks
+##### `addBlocks`
 
-```JavaScript
+```js
 bs.addBlocks(blockArray, function (err) {
   if (!err) {
     // blocks successfuly added
@@ -111,9 +120,9 @@ bs.addBlocks(blockArray, function (err) {
 })
 ```
 
-##### getBlock
+##### `getBlock`
 
-```JavaScript
+```js
 bs.getBlock(multihash, function (err, block) {
   if (!err) {
     // block successfuly retrieved
@@ -122,9 +131,9 @@ bs.getBlock(multihash, function (err, block) {
 ```
 
 
-##### getBlocks
+##### `getBlocks`
 
-```JavaScript
+```js
 bs.getBlocks(multihashArray, function (err, block) {
   if (!err) {
     // block successfuly retrieved
@@ -132,9 +141,9 @@ bs.getBlocks(multihashArray, function (err, block) {
 })
 ```
 
-##### deleteBlock
+##### `deleteBlock`
 
-```JavaScript
+```js
 bs.deleteBlock(multihash, function (err) {
   if (!err) {
     // block successfuly deleted
@@ -142,9 +151,9 @@ bs.deleteBlock(multihash, function (err) {
 })
 ```
 
-##### deleteBlocks
+##### `deleteBlocks`
 
-```JavaScript
+```js
 bs.deleteBlocks(multihashArray, function (err) {
   if (!err) {
     // blocks successfuly deleted

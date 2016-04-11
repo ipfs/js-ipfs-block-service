@@ -1,41 +1,34 @@
 /* eslint-env mocha */
 'use strict'
 
-const fs = require('fs')
 const ncp = require('ncp').ncp
 const rimraf = require('rimraf')
 const expect = require('chai').expect
+const path = require('path')
+const IPFSRepo = require('ipfs-repo')
 
-describe('blocks', () => {
-  const repoExample = process.cwd() + '/test/example-repo'
-  const repoTests = process.cwd() + '/test/repo-just-for-test' + Date.now()
+const tests = require('./block-service-test')
+
+describe('IPFS Block Tests on Node.js', () => {
+  const testRepoPath = path.join(__dirname, 'test-repo')
+  const date = Date.now().toString()
+  const repoPath = testRepoPath + '-for-' + date
 
   before((done) => {
-    ncp(repoExample, repoTests, (err) => {
-      process.env.IPFS_PATH = repoTests
-      expect(err).to.equal(null)
+    ncp(testRepoPath, repoPath, (err) => {
+      expect(err).to.not.exist
       done()
     })
   })
 
   after((done) => {
-    rimraf(repoTests, (err) => {
-      expect(err).to.equal(null)
+    rimraf(repoPath, (err) => {
+      expect(err).to.not.exist
       done()
     })
   })
 
-  const tests = fs.readdirSync(__dirname)
-  tests.filter((file) => {
-    if (file === 'index.js' ||
-        file === 'example-repo' ||
-        file.indexOf('repo-just-for-test') > -1 ||
-        file === 'browser.js') {
-      return false
-    }
-
-    return true
-  }).forEach((file) => {
-    require('./' + file)
-  })
+  const fs = require('fs-blob-store')
+  const repo = new IPFSRepo(repoPath, {stores: fs})
+  tests(repo)
 })
