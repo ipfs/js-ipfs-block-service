@@ -31,4 +31,23 @@ describe('block', () => {
 
     expect(key.equals(block.key)).to.equal(false)
   })
+
+  it('has the right extension to type mapping', () => {
+    const b1 = new Block('hello', 'protobuf')
+    const b2 = new Block('hello')
+    const b3 = new Block('hello', 'ipld')
+    const b4 = new Block('hello', 'woot')
+
+    expect(b1.type).to.be.eql('protobuf')
+    expect(b1.extension).to.be.eql('data')
+
+    expect(b2.type).to.be.eql('protobuf')
+    expect(b2.extension).to.be.eql('data')
+
+    expect(b3.type).to.be.eql('ipld')
+    expect(b3.extension).to.be.eql('ipld')
+
+    expect(b4.type).to.be.eql('woot')
+    expect(b4.extension).to.be.eql('woot')
+  })
 })

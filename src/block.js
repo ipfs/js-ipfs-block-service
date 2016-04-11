@@ -2,7 +2,7 @@
 const util = require('./util')
 
 // Immutable block of data
-function Block (data, extension) {
+function Block (data, type) {
   if (!data) {
     throw new Error('Block must be constructed with data')
   }
@@ -18,7 +18,20 @@ function Block (data, extension) {
   }
 
   this.key = util.hash(this.data)
-  this.extension = extension || 'data'
+  this.type = type || 'protobuf'
 }
+
+Object.defineProperty(Block.prototype, 'extension', {
+  get () {
+    switch (this.type) {
+      case 'protobuf':
+        return 'data'
+      case 'ipld':
+        return 'ipld'
+      default:
+        return this.type
+    }
+  }
+})
 
 module.exports = Block
