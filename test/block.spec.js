@@ -12,6 +12,13 @@ describe('block', () => {
     expect(b.extension).to.be.eql('data')
   })
 
+  it('create /wo new', () => {
+    const b = Block('random-data')
+    expect(b.key).to.exist
+    expect(b.data).to.exist
+    expect(b.extension).to.be.eql('data')
+  })
+
   it('fail to create an empty block', () => {
     expect(() => new Block()).to.throw()
   })
