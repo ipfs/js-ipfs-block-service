@@ -58,6 +58,7 @@ function BlockService (ipfsRepo, exchange) {
       this.getBlock(multihash, extension, (err, block) => {
         if (err) { return next(err) }
         blocks.push(block)
+        next()
       })
     }, (err) => {
       callback(err, blocks)
