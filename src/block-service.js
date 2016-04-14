@@ -85,7 +85,7 @@ function BlockService (ipfsRepo, exchange) {
     }
 
     if (!Array.isArray(multihashes)) {
-      return callback('Invalid batch of multihashes')
+      return callback(new Error('Invalid batch of multihashes'))
     }
 
     async.each(multihashes, (multihash, next) => {
