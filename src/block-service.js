@@ -35,11 +35,19 @@ function BlockService (ipfsRepo, exchange) {
       return callback(new Error('Invalid multihash'))
     }
 
-    ipfsRepo.datastore.createReadStream(multihash, extension)
-      .pipe(bl((err, data) => {
-        if (err) { return callback(err) }
-        callback(null, new Block(data, extension))
-      }))
+    ipfsRepo.datastore.exists(multihash, (err, exists) => {
+      if (err) { return callback(err) }
+
+      if (exists) {
+        ipfsRepo.datastore.createReadStream(multihash, extension)
+          .pipe(bl((err, data) => {
+            if (err) { return callback(err) }
+            callback(null, new Block(data, extension))
+          }))
+      } else {
+        callback(null, null)
+      }
+    })
   }
 
   this.getBlocks = (multihashes, extension, callback) => {
@@ -57,7 +65,9 @@ function BlockService (ipfsRepo, exchange) {
     async.each(multihashes, (multihash, next) => {
       this.getBlock(multihash, extension, (err, block) => {
         if (err) { return next(err) }
-        blocks.push(block)
+        if (block) {
+          blocks.push(block)
+        }
         next()
       })
     }, (err) => {
