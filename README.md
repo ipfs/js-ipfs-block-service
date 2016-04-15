@@ -6,7 +6,7 @@ IPFS Blocks JavaScript Implementation
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
 [![Travis CI](https://travis-ci.org/ipfs/js-ipfs-blocks.svg?branch=master)](https://travis-ci.org/ipfs/js-ipfs-blocks)
 [![Circle CI](https://circleci.com/gh/ipfs/js-ipfs-blocks.svg?style=svg)](https://circleci.com/gh/ipfs/js-ipfs-blocks)
-![](https://img.shields.io/badge/coverage-77-yellow.svg?style=flat-square)
+[![Coverage Status](https://coveralls.io/repos/github/ipfs/js-ipfs-blocks/badge.svg?branch=master)](https://coveralls.io/github/ipfs/js-ipfs-blocks?branch=master)
 [![Dependency Status](https://david-dm.org/ipfs/js-ipfs-blocks.svg?style=flat-square)](https://david-dm.org/ipfs/js-ipfs-blocks)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 

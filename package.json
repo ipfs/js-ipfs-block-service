@@ -2,15 +2,17 @@
   "name": "ipfs-blocks",
   "version": "0.1.2",
   "description": "JavaScript Implementation of Block and BlockService",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "jsnext:main": "src/index.js",
   "scripts": {
-    "lint": "dignified-lint",
-    "build": "dignified-build",
-    "test": "dignified-test",
-    "test:node": "dignified-test node",
-    "test:browser": "dignified-test browser",
-    "release": "dignified-release",
-    "coverage": "dignified-coverage"
+    "lint": "aegir-lint",
+    "build": "aegir-build",
+    "test": "aegir-test",
+    "test:node": "aegir-test node",
+    "test:browser": "aegir-test browser",
+    "release": "aegir-release",
+    "coverage": "aegir-coverage",
+    "coverage-publish": "aegir-coverage publish"
   },
   "pre-commit": [
     "lint",
@@ -33,10 +35,10 @@
   },
   "homepage": "https://github.com/ipfs/js-ipfs-blocks#readme",
   "devDependencies": {
+    "aegir": "^2.1.1",
     "bs58": "^3.0.0",
     "buffer-loader": "0.0.1",
     "chai": "^3.5.0",
-    "dignified.js": "^1.0.0",
     "fs-blob-store": "^5.2.1",
     "idb-plus-blob-store": "^1.0.0",
     "ipfs-repo": "^0.6.1",
