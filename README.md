@@ -10,51 +10,98 @@ IPFS Blocks JavaScript Implementation
 [![Dependency Status](https://david-dm.org/ipfs/js-ipfs-blocks.svg?style=flat-square)](https://david-dm.org/ipfs/js-ipfs-blocks)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 
-> JavaScript Implementation of the BlockService and Block data structure
+> [IPFS][ipfs] implementation of the BlockService and Block data structure in
+> JavaScript.
 
-## Architecture
+## Description
+
+**Block** - A block is a blob of binary data.
+
+**BlockService** - A BlockService is a content-addressable store for blocks,
+providing an API for adding, deleting, and retrieving blocks. A BlockService is
+backed by an [IPFS Repo][repo] as its datastore for blocks, and uses an [IPFS
+Exchange][bitswap] implementation to fetch blocks from the network.
 
 ```markdown
 ┌────────────────────┐
-│   BlockService     │
+│     BlockService   │
 └────────────────────┘
            │
      ┌─────┴─────┐
      ▼           ▼
 ┌─────────┐ ┌────────┐
-│IPFS REPO│ │Exchange│
+│IPFS Repo│ │Exchange│
 └─────────┘ └────────┘
 ```
 
-**BlockService** - The BlockService uses IPFS Repo as the local datastore for blocks and an IPFS Exchange compliant implementation to fetch blocks from the network.
+## Example
 
-A Block is a data structure available on this module.
+```js
+const blocks = require('ipfs-blocks')
+const IPFSRepo = require('ipfs-repo')  // storage repo
+const memstore = require('abstract-blob-store')  // in-memory store
 
-# Installation
+// setup a repo
+var repo = new IPFSRepo('example', { stores: memstore })
 
-## npm
+// create a block
+const block = new blocks.Block('hello warld')
+console.log(block.data)
+console.log(block.key)
+
+// create a service
+const bs = new blocks.BlockService(repo)
+
+// add the block, then retrieve it
+bs.addBlock(block, function (err) {
+  bs.getBlock(block.key, function (err, b) {
+    console.log(block.data.toString() === b.data.toString())
+  })
+})
+```
+
+outputs
+
+```
+<Buffer 68 65 6c 6c 6f 20 77 61 72 6c 64>
+
+<Buffer 12 20 db 3c 15 23 3f f3 84 8f 42 fe 3b 74 78 90 90 5a 80 7e a6 ef 2b 6d 2f 3c 8b 2c b7 ae be 86 3c 4d>
+
+true
+
+```
+
+## Installation
+
+### npm
 
 ```sh
 > npm i ipfs-blocks
 ```
 
-## Use in Node.js
+## Setup
+
+### Node.js
 
 ```js
-const ipfsBlocks = require('ipfs-blocks')
+const blocks = require('ipfs-blocks')
 ```
 
-## Use in a browser with browserify, webpack or any other bundler
+### Browser: Browserify, Webpack, other bundlers
 
-The code published to npm that gets loaded on require is in fact a ES5 transpiled version with the right shims added. This means that you can require it and use with your favourite bundler without having to adjust asset management process.
+The code published to npm that gets loaded on require is in fact a ES5
+transpiled version with the right shims added. This means that you can require
+it and use with your favourite bundler without having to adjust asset management
+process.
 
 ```JavaScript
-var ipfsBlocks = require('ipfs-blocks')
+var blocks = require('ipfs-blocks')
 ```
 
-## Use in a browser Using a script tag
+### Browser: `<script>` Tag
 
-Loading this module through a script tag will make the `Unixfs` obj available in the global namespace.
+Loading this module through a script tag will make the `Unixfs` obj available in
+the global namespace.
 
 ```html
 <script src="https://npmcdn.com/ipfs-blocks/dist/index.min.js"></script>
@@ -62,101 +109,71 @@ Loading this module through a script tag will make the `Unixfs` obj available in
 <script src="https://npmcdn.com/ipfs-blocks/dist/index.js"></script>
 ```
 
-# Usage
-
-
-```js
-// then, to access each of the components
-ipfsBlocks.BlockService
-ipfsBlocks.Block
-```
-
-#### Block
-
-Create a new block
+## API
 
 ```js
-const block = new blocks.Block('some data')
-console.log(block.data)
-// It will print 'some data'
-
-console.log(block.key)
-// It will print the sha256 multihash of 'some data'
+const blocks = require('ipfs-blocks')
 ```
 
-A block can also have it's own extension, which by default is `data`.
+### Block
 
-```js
-const block = new blocks.Block('data', 'ipld')
-console.log(block.extension)
-// => ipld
-```
+#### var block = new blocks.Block(data)
 
-#### BlockService
+Creates a new block with raw data `data`.
 
-Create a new block service
+#### block.data
 
-```js
-const bs = new ipfsBlocks.BlockService(<IPFS REPO instance> [, <IPFS Exchange>])
-```
+The raw data of the block. Its format matches whatever was provided in its
+constructor.
 
-##### `addBlock`
+#### block.key
 
-```js
-bs.addBlock(block, function (err) {
-  if (!err) {
-    // block successfuly added
-  }
-})
-```
+The [multihash][multihash] of the block's data, as a buffer.
 
-##### `addBlocks`
+### var bs = new blocks.BlockService(repo[, exchange])
 
-```js
-bs.addBlocks(blockArray, function (err) {
-  if (!err) {
-    // blocks successfuly added
-  }
-})
-```
+Creates a new block service backed by [IPFS Repo][repo] `repo` for storage, and
+[IPFS Exchange][bitswap] for retrieving blocks from the network. Providing an
+`exchange` is optional.
 
-##### `getBlock`
+#### bs.addBlock(block, callback(err))
 
-```js
-bs.getBlock(multihash, function (err, block) {
-  if (!err) {
-    // block successfuly retrieved
-  }
-})
-```
+Asynchronously adds a block instance to the underlying repo.
 
+#### bs.addBlocks(blocks, callback(err))
 
-##### `getBlocks`
+Asynchronously adds an array of block instances to the underlying repo.
 
-```js
-bs.getBlocks(multihashArray, function (err, block) {
-  if (!err) {
-    // block successfuly retrieved
-  }
-})
-```
+*Does not guarantee atomicity.*
 
-##### `deleteBlock`
+#### bs.getBlock(multihash, callback(err, block))
 
-```js
-bs.deleteBlock(multihash, function (err) {
-  if (!err) {
-    // block successfuly deleted
-  }
-})
-```
+Asynchronously returns the block whose content multihash matches `multihash`.
 
-##### `deleteBlocks`
+#### bs.getBlocks(multihashes, callback(err, blocks))
 
-```js
-bs.deleteBlocks(multihashArray, function (err) {
-  if (!err) {
-    // blocks successfuly deleted
-  }
-})
-```
+Asynchronously returns the blocks whose content multihashes match the array
+`multihashes`.
+
+*Does not guarantee atomicity.*
+
+#### bs.deleteBlock(multihash, callback(err))
+
+Asynchronously deletes the block from the store with content multihash matching
+`multihash`, if it exists.
+
+#### bs.deleteBlocks(multihashes, callback(err))
+
+Asynchronously deletes all blocks from the store with content multihashes matching
+from the array `multihashes`.
+
+*Does not guarantee atomicity.*
+
+## License
+
+MIT
+
+[ipfs]: https://ipfs.io
+[repo]: https://github.com/ipfs/specs/tree/master/repo
+[bitswap]: https://github.com/ipfs/specs/tree/master/bitswap
+[multihash]: https://github.com/jbenet/js-multihash
