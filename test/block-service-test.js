@@ -109,7 +109,7 @@ module.exports = (repo) => {
 
         bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
           expect(err).to.exist
-          expect(blocks).to.have.lengthOf(0)
+          expect(blocks).to.have.length.below(3)
           done()
         })
       })
