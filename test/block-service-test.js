@@ -44,8 +44,7 @@ module.exports = (repo) => {
     it('get a non existent block', (done) => {
       const b = new Block('Not stored')
       bs.getBlock(b.key, (err, block) => {
-        expect(err).to.not.exist
-        expect(block).to.not.exist
+        expect(err).to.exist
         done()
       })
     })
@@ -109,8 +108,8 @@ module.exports = (repo) => {
         expect(err).to.not.exist
 
         bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
-          expect(err).to.not.exist
-          expect(blocks).to.have.lengthOf(2)
+          expect(err).to.exist
+          expect(blocks).to.have.lengthOf(0)
           done()
         })
       })
@@ -123,8 +122,7 @@ module.exports = (repo) => {
         bs.deleteBlock(b.key, (err) => {
           expect(err).to.not.exist
           bs.getBlock(b.key, (err, block) => {
-            expect(err).to.not.exist
-            expect(block).to.not.exist
+            expect(err).to.exist
             done()
           })
         })
@@ -145,8 +143,7 @@ module.exports = (repo) => {
         bs.deleteBlock(b.key, 'ext', (err) => {
           expect(err).to.not.exist
           bs.getBlock(b.key, 'ext', (err, block) => {
-            expect(err).to.not.exist
-            expect(block).to.not.exist
+            expect(err).to.exist
             done()
           })
         })
