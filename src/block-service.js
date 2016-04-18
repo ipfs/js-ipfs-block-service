@@ -52,18 +52,18 @@ function BlockService (ipfsRepo, exchange) {
       return callback(new Error('Invalid batch of multihashes'))
     }
 
-    const blocks = []
+    var results = {}
 
     async.each(multihashes, (multihash, next) => {
       this.getBlock(multihash, extension, (err, block) => {
-        if (err) { return next(err) }
-        if (block) {
-          blocks.push(block)
+        results[multihash] = {
+          err: err,
+          block: block
         }
         next()
       })
     }, (err) => {
-      callback(err, blocks)
+      callback(err, results)
     })
   }
 

@@ -157,7 +157,18 @@ If the block could not be found, expect `err.code` to be `'ENOENT'`.
 
 Asynchronously returns the blocks whose content multihashes match the array
 `multihashes`.
-Returns an error (`err.code === 'ENOENT'`) if *any* the blocks do not exist.
+
+`blocks` is an object that maps each `multihash` to an object of the form
+
+```js
+{
+  err: Error
+  block: Block
+}
+```
+
+Expect `blocks[multihash].err.code === 'ENOENT'`  and `blocks[multihash].block
+=== null` if a block did not exist.
 
 *Does not guarantee atomicity.*
 

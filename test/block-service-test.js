@@ -93,7 +93,16 @@ module.exports = (repo) => {
 
         bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
           expect(err).to.not.exist
-          expect(blocks).to.have.lengthOf(3)
+          expect(Object.keys(blocks)).to.have.lengthOf(3)
+          expect(blocks[b1.key]).to.exist
+          expect(blocks[b1.key].err).to.not.exist
+          expect(blocks[b1.key].block.data).to.deep.equal(b1.data)
+          expect(blocks[b2.key]).to.exist
+          expect(blocks[b2.key].err).to.not.exist
+          expect(blocks[b2.key].block.data).to.deep.equal(b2.data)
+          expect(blocks[b3.key]).to.exist
+          expect(blocks[b3.key].err).to.not.exist
+          expect(blocks[b3.key].block.data).to.deep.equal(b3.data)
           done()
         })
       })
@@ -108,8 +117,17 @@ module.exports = (repo) => {
         expect(err).to.not.exist
 
         bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
-          expect(err).to.exist
-          expect(blocks).to.have.length.below(3)
+          expect(err).to.not.exist
+          expect(Object.keys(blocks)).to.have.lengthOf(3)
+          expect(blocks[b1.key]).to.exist
+          expect(blocks[b1.key].err).to.not.exist
+          expect(blocks[b1.key].block.data).to.deep.equal(b1.data)
+          expect(blocks[b2.key]).to.exist
+          expect(blocks[b2.key].err).to.exist
+          expect(blocks[b2.key].block).to.not.exist
+          expect(blocks[b3.key]).to.exist
+          expect(blocks[b3.key].err).to.not.exist
+          expect(blocks[b3.key].block.data).to.deep.equal(b3.data)
           done()
         })
       })
