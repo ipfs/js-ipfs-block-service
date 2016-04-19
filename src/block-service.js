@@ -26,13 +26,13 @@ function BlockService (ipfsRepo, exchange) {
   }
 
   this.getBlock = (multihash, extension, callback) => {
-    if (!multihash) {
-      return callback(new Error('Invalid multihash'))
-    }
-
     if (typeof extension === 'function') {
       callback = extension
       extension = undefined
+    }
+
+    if (!multihash) {
+      return callback(new Error('Invalid multihash'))
     }
 
     ipfsRepo.datastore.createReadStream(multihash, extension)
@@ -43,48 +43,51 @@ function BlockService (ipfsRepo, exchange) {
   }
 
   this.getBlocks = (multihashes, extension, callback) => {
+    if (typeof extension === 'function') {
+      callback = extension
+      extension = undefined
+    }
+
     if (!Array.isArray(multihashes)) {
       return callback(new Error('Invalid batch of multihashes'))
     }
 
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
-    }
-
-    const blocks = []
+    var results = {}
 
     async.each(multihashes, (multihash, next) => {
       this.getBlock(multihash, extension, (err, block) => {
-        if (err) { return next(err) }
-        blocks.push(block)
+        results[multihash] = {
+          err: err,
+          block: block
+        }
+        next()
       })
     }, (err) => {
-      callback(err, blocks)
+      callback(err, results)
     })
   }
 
   this.deleteBlock = (multihash, extension, callback) => {
-    if (!multihash) {
-      return callback(new Error('Invalid multihash'))
-    }
-
     if (typeof extension === 'function') {
       callback = extension
       extension = undefined
+    }
+
+    if (!multihash) {
+      return callback(new Error('Invalid multihash'))
     }
 
     ipfsRepo.datastore.remove(multihash, extension, callback)
   }
 
   this.deleteBlocks = (multihashes, extension, callback) => {
-    if (!Array.isArray(multihashes)) {
-      return callback('Invalid batch of multihashes')
-    }
-
     if (typeof extension === 'function') {
       callback = extension
       extension = undefined
+    }
+
+    if (!Array.isArray(multihashes)) {
+      return callback(new Error('Invalid batch of multihashes'))
     }
 
     async.each(multihashes, (multihash, next) => {

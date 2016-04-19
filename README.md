@@ -149,11 +149,26 @@ Asynchronously adds an array of block instances to the underlying repo.
 #### bs.getBlock(multihash, callback(err, block))
 
 Asynchronously returns the block whose content multihash matches `multihash`.
+Returns an error (`err.code === 'ENOENT'`) if the block does not exist.
+
+If the block could not be found, expect `err.code` to be `'ENOENT'`.
 
 #### bs.getBlocks(multihashes, callback(err, blocks))
 
 Asynchronously returns the blocks whose content multihashes match the array
 `multihashes`.
+
+`blocks` is an object that maps each `multihash` to an object of the form
+
+```js
+{
+  err: Error
+  block: Block
+}
+```
+
+Expect `blocks[multihash].err.code === 'ENOENT'`  and `blocks[multihash].block
+=== null` if a block did not exist.
 
 *Does not guarantee atomicity.*
 
