@@ -54,5 +54,10 @@
     "bl": "^1.0.1",
     "detect-node": "^2.0.3",
     "multihashing": "^0.2.0"
-  }
+  },
+  "contributors": [
+    "David Dias <daviddias.p@gmail.com>",
+    "Stephen Whitmore <stephen.whitmore@gmail.com>",
+    "dignifiedquire <dignifiedquire@gmail.com>"
+  ]
 }
