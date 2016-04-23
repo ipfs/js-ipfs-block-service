@@ -10,8 +10,17 @@ const async = require('async')
 function BlockService (ipfsRepo, exchange) {
   this.addBlock = (block, callback) => {
     const ws = ipfsRepo.datastore.createWriteStream(block.key, block.extension)
+
+    let done = false
+
     ws.write(block.data)
-    ws.once('finish', callback)
+    ws.once('error', (err) => {
+      done = true
+      callback(err)
+    })
+    ws.once('finish', () => {
+      if (!done) callback()
+    })
     ws.end()
   }
 
