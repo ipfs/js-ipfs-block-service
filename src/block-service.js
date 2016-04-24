@@ -20,7 +20,7 @@ function BlockService (ipfsRepo, exchange) {
       return callback(new Error('expects an array of Blocks'))
     }
 
-    async.each(blocks, (block, next) => {
+    async.eachLimit(blocks, 100, (block, next) => {
       this.addBlock(block, next)
     }, callback)
   }
@@ -54,7 +54,7 @@ function BlockService (ipfsRepo, exchange) {
 
     var results = {}
 
-    async.each(multihashes, (multihash, next) => {
+    async.eachLimit(multihashes, 100, (multihash, next) => {
       this.getBlock(multihash, extension, (err, block) => {
         results[multihash] = {
           err: err,
@@ -90,7 +90,7 @@ function BlockService (ipfsRepo, exchange) {
       return callback(new Error('Invalid batch of multihashes'))
     }
 
-    async.each(multihashes, (multihash, next) => {
+    async.eachLimit(multihashes, 100, (multihash, next) => {
       this.deleteBlock(multihash, extension, next)
     }, (err) => {
       callback(err)
