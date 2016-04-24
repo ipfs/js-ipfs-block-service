@@ -193,5 +193,24 @@ module.exports = (repo) => {
         done()
       })
     })
+
+    it('stores and gets lots of blocks', (done) => {
+      const blocks = []
+      const count = 1000
+      while (blocks.length < count) {
+        blocks.push(new Block('hello-' + Math.random()))
+      }
+
+      bs.addBlocks(blocks, (err) => {
+        expect(err).to.not.exist
+
+        bs.getBlocks(blocks.map((b) => b.key), (err, res) => {
+          expect(err).to.not.exist
+          expect(Object.keys(res)).to.have.length(count)
+
+          done()
+        })
+      })
+    })
   })
 }
