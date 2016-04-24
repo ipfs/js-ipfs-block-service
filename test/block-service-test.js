@@ -194,7 +194,9 @@ module.exports = (repo) => {
       })
     })
 
-    it('stores and gets lots of blocks', (done) => {
+    it('stores and gets lots of blocks', function (done) {
+      this.timeout(60 * 1000)
+
       const blocks = []
       const count = 1000
       while (blocks.length < count) {
