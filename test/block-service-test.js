@@ -29,7 +29,7 @@ module.exports = (repo) => {
     })
 
     it('store and get a block, with custom extension', (done) => {
-      const b = new Block('A random data block', 'ext')
+      const b = new Block('A random data block 2', 'ext')
       bs.addBlock(b, (err) => {
         expect(err).to.not.exist
         bs.getBlock(b.key, 'ext', (err, block) => {

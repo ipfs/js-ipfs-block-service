@@ -1,5 +1,5 @@
 test/repo-just-for-test*
-
+test/test-repo-for-*
 # Logs
 logs
 *.log

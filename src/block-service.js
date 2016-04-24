@@ -14,12 +14,32 @@ function BlockService (ipfsRepo, exchange) {
     let done = false
 
     ws.write(block.data)
+
     ws.once('error', (err) => {
       done = true
       callback(err)
     })
+
     ws.once('finish', () => {
-      if (!done) callback()
+      if (!done) {
+        // Important to note: Writing to a stream
+        // isn't an atomic process, because streams can be
+        // piped, and the finish of one only represents that
+        // the data was buffered to the next one.
+        // This is something known and 'accepted' on the
+        // streams API, however, since we expose a callback
+        // interface on BlockService and a streams one,
+        // the users will expect for the callback to be fired
+        // when the final write was concluded. We add a
+        // timeout to ensure that.
+        // TODO: Create an elegant way to understand when
+        // the block was actually flushed to disk. This
+        // means changing how the blob-stores and repo are
+        // implemented.
+        // One option, is polling till we check it
+        // is written.
+        setTimeout(callback, 150)
+      }
     })
     ws.end()
   }
