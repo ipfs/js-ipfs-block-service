@@ -1,7 +1,7 @@
 {
-  "name": "ipfs-blocks",
+  "name": "ipfs-block-service",
   "version": "0.2.3",
-  "description": "JavaScript Implementation of Block and BlockService",
+  "description": "JavaScript Implementation of BlockService",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ipfs/js-ipfs-blocks.git"
+    "url": "git+https://github.com/ipfs/js-ipfs-block-service.git"
   },
   "keywords": [
     "IPFS"
@@ -33,9 +33,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ipfs/js-ipfs-blocks/issues"
+    "url": "https://github.com/ipfs/js-ipfs-block-service/issues"
   },
-  "homepage": "https://github.com/ipfs/js-ipfs-blocks#readme",
+  "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
     "aegir": "^2.1.1",
     "bs58": "^3.0.0",
@@ -53,6 +53,7 @@
     "async": "^1.5.2",
     "bl": "^1.0.1",
     "detect-node": "^2.0.3",
+    "ipfs-block": "^0.2.0",
     "multihashing": "^0.2.0"
   },
   "contributors": [

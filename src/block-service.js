@@ -1,6 +1,6 @@
 'use strict'
 
-const Block = require('./block')
+const Block = require('ipfs-block')
 const bl = require('bl')
 const async = require('async')
 
