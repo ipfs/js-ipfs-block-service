@@ -1,21 +1,19 @@
-IPFS Blocks JavaScript Implementation
+IPFS Block Service JavaScript Implementation
 =====================================
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
 [![](https://img.shields.io/badge/project-IPFS-blue.svg?style=flat-square)](http://ipfs.io/)
 [![](https://img.shields.io/badge/freenode-%23ipfs-blue.svg?style=flat-square)](http://webchat.freenode.net/?channels=%23ipfs)
-[![Travis CI](https://travis-ci.org/ipfs/js-ipfs-blocks.svg?branch=master)](https://travis-ci.org/ipfs/js-ipfs-blocks)
-[![Circle CI](https://circleci.com/gh/ipfs/js-ipfs-blocks.svg?style=svg)](https://circleci.com/gh/ipfs/js-ipfs-blocks)
-[![Coverage Status](https://coveralls.io/repos/github/ipfs/js-ipfs-blocks/badge.svg?branch=master)](https://coveralls.io/github/ipfs/js-ipfs-blocks?branch=master)
-[![Dependency Status](https://david-dm.org/ipfs/js-ipfs-blocks.svg?style=flat-square)](https://david-dm.org/ipfs/js-ipfs-blocks)
+[![Travis CI](https://travis-ci.org/ipfs/js-ipfs-block-service.svg?branch=master)](https://travis-ci.org/ipfs/js-ipfs-block-service)
+[![Circle CI](https://circleci.com/gh/ipfs/js-ipfs-block-service.svg?style=svg)](https://circleci.com/gh/ipfs/js-ipfs-block-service)
+[![Coverage Status](https://coveralls.io/repos/github/ipfs/js-ipfs-block-service/badge.svg?branch=master)](https://coveralls.io/github/ipfs/js-ipfs-block-service?branch=master)
+[![Dependency Status](https://david-dm.org/ipfs/js-ipfs-block-service.svg?style=flat-square)](https://david-dm.org/ipfs/js-ipfs-block-service)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 
 > [IPFS][ipfs] implementation of the BlockService and Block data structure in
 > JavaScript.
 
 ## Description
-
-**Block** - A block is a blob of binary data.
 
 **BlockService** - A BlockService is a content-addressable store for blocks,
 providing an API for adding, deleting, and retrieving blocks. A BlockService is
@@ -37,7 +35,8 @@ Exchange][bitswap] implementation to fetch blocks from the network.
 ## Example
 
 ```js
-const blocks = require('ipfs-blocks')
+const BlockService = require('ipfs-block-service')
+const Block = require('ipfs-block')
 const IPFSRepo = require('ipfs-repo')  // storage repo
 const memstore = require('abstract-blob-store')  // in-memory store
 
@@ -45,12 +44,12 @@ const memstore = require('abstract-blob-store')  // in-memory store
 var repo = new IPFSRepo('example', { stores: memstore })
 
 // create a block
-const block = new blocks.Block('hello warld')
+const block = new Block('hello warld')
 console.log(block.data)
 console.log(block.key)
 
 // create a service
-const bs = new blocks.BlockService(repo)
+const bs = new BlockService(repo)
 
 // add the block, then retrieve it
 bs.addBlock(block, function (err) {
@@ -76,7 +75,7 @@ true
 ### npm
 
 ```sh
-> npm i ipfs-blocks
+> npm i ipfs-block-service
 ```
 
 ## Setup
@@ -84,7 +83,7 @@ true
 ### Node.js
 
 ```js
-const blocks = require('ipfs-blocks')
+const BlockService = require('ipfs-block-service')
 ```
 
 ### Browser: Browserify, Webpack, other bundlers
@@ -95,7 +94,7 @@ it and use with your favourite bundler without having to adjust asset management
 process.
 
 ```JavaScript
-var blocks = require('ipfs-blocks')
+var BlockService = require('ipfs-block-service')
 ```
 
 ### Browser: `<script>` Tag
@@ -104,33 +103,18 @@ Loading this module through a script tag will make the `Unixfs` obj available in
 the global namespace.
 
 ```html
-<script src="https://npmcdn.com/ipfs-blocks/dist/index.min.js"></script>
+<script src="https://npmcdn.com/ipfs-block-service/dist/index.min.js"></script>
 <!-- OR -->
-<script src="https://npmcdn.com/ipfs-blocks/dist/index.js"></script>
+<script src="https://npmcdn.com/ipfs-block-service/dist/index.js"></script>
 ```
 
 ## API
 
 ```js
-const blocks = require('ipfs-blocks')
+const BlockService = require('ipfs-block-service')
 ```
 
-### Block
-
-#### var block = new blocks.Block(data)
-
-Creates a new block with raw data `data`.
-
-#### block.data
-
-The raw data of the block. Its format matches whatever was provided in its
-constructor.
-
-#### block.key
-
-The [multihash][multihash] of the block's data, as a buffer.
-
-### var bs = new blocks.BlockService(repo[, exchange])
+### var bs = new BlockService(repo[, exchange])
 
 Creates a new block service backed by [IPFS Repo][repo] `repo` for storage, and
 [IPFS Exchange][bitswap] for retrieving blocks from the network. Providing an

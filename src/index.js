@@ -1,5 +1,4 @@
 'use strict'
 
-exports.BlockService = require('./block-service.js')
-exports.Block = require('./block.js')
+exports = module.exports = require('./block-service.js')
 exports.util = require('./util.js')

@@ -2,8 +2,8 @@
 'use strict'
 
 const expect = require('chai').expect
-const Block = require('../src').Block
-const BlockService = require('../src').BlockService
+const Block = require('ipfs-block')
+const BlockService = require('../src')
 
 module.exports = (repo) => {
   describe('block-service', () => {
