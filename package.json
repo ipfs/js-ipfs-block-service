@@ -11,8 +11,8 @@
     "test:node": "aegir-test node",
     "test:browser": "aegir-test browser",
     "release": "aegir-release",
-    "release-minor": "aegir-release minor",
-    "release-major": "aegir-release major",
+    "release-minor": "aegir-release --type minor",
+    "release-major": "aegir-release --type major",
     "coverage": "aegir-coverage",
     "coverage-publish": "aegir-coverage publish"
   },
@@ -37,24 +37,21 @@
   },
   "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
-    "aegir": "^2.1.1",
+    "aegir": "^3.0.0",
     "bs58": "^3.0.0",
     "buffer-loader": "0.0.1",
     "chai": "^3.5.0",
     "fs-blob-store": "^5.2.1",
     "idb-plus-blob-store": "^1.1.1",
-    "ipfs-repo": "^0.6.6",
+    "ipfs-repo": "^0.7.1",
     "lodash": "^4.8.2",
     "ncp": "^2.0.0",
     "pre-commit": "^1.1.2",
+    "ipfs-block": "^0.2.0",
     "rimraf": "^2.5.1"
   },
   "dependencies": {
-    "async": "^1.5.2",
-    "bl": "^1.0.1",
-    "detect-node": "^2.0.3",
-    "ipfs-block": "^0.2.0",
-    "multihashing": "^0.2.0"
+    "async": "^1.5.2"
   },
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",

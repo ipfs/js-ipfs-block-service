@@ -9,7 +9,7 @@ module.exports = (repo) => {
   describe('block-service', () => {
     let bs
 
-    it('create a block-service', (done) => {
+    before((done) => {
       bs = new BlockService(repo)
       expect(bs).to.exist
       done()

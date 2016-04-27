@@ -1,19 +1,12 @@
 'use strict'
 
-const Block = require('ipfs-block')
-const bl = require('bl')
 const async = require('async')
 
 // BlockService is a hybrid block datastore. It stores data in a local
 // datastore and may retrieve data from a remote Exchange.
 // It uses an internal `datastore.Datastore` instance to store values.
 function BlockService (ipfsRepo, exchange) {
-  this.addBlock = (block, callback) => {
-    const ws = ipfsRepo.datastore.createWriteStream(block.key, block.extension, callback)
-
-    ws.write(block.data)
-    ws.end()
-  }
+  this.addBlock = ipfsRepo.datastore.put.bind(ipfsRepo.datastore)
 
   this.addBlocks = (blocks, callback) => {
     if (!Array.isArray(blocks)) {
@@ -25,22 +18,7 @@ function BlockService (ipfsRepo, exchange) {
     }, callback)
   }
 
-  this.getBlock = (multihash, extension, callback) => {
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
-    }
-
-    if (!multihash) {
-      return callback(new Error('Invalid multihash'))
-    }
-
-    ipfsRepo.datastore.createReadStream(multihash, extension)
-      .pipe(bl((err, data) => {
-        if (err) { return callback(err) }
-        callback(null, new Block(data, extension))
-      }))
-  }
+  this.getBlock = ipfsRepo.datastore.get.bind(ipfsRepo.datastore)
 
   this.getBlocks = (multihashes, extension, callback) => {
     if (typeof extension === 'function') {
@@ -67,18 +45,7 @@ function BlockService (ipfsRepo, exchange) {
     })
   }
 
-  this.deleteBlock = (multihash, extension, callback) => {
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
-    }
-
-    if (!multihash) {
-      return callback(new Error('Invalid multihash'))
-    }
-
-    ipfsRepo.datastore.remove(multihash, extension, callback)
-  }
+  this.deleteBlock = ipfsRepo.datastore.delete.bind(ipfsRepo.datastore)
 
   this.deleteBlocks = (multihashes, extension, callback) => {
     if (typeof extension === 'function') {
