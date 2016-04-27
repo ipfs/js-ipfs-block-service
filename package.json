@@ -11,8 +11,8 @@
     "test:node": "aegir-test node",
     "test:browser": "aegir-test browser",
     "release": "aegir-release",
-    "release-minor": "aegir-release minor",
-    "release-major": "aegir-release major",
+    "release-minor": "aegir-release --type minor",
+    "release-major": "aegir-release --type major",
     "coverage": "aegir-coverage",
     "coverage-publish": "aegir-coverage publish"
   },
@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
-    "aegir": "^2.1.1",
+    "aegir": "^3.0.0",
     "bs58": "^3.0.0",
     "buffer-loader": "0.0.1",
     "chai": "^3.5.0",
