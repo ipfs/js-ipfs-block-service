@@ -1,6 +1,6 @@
 {
   "name": "ipfs-block-service",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "JavaScript Implementation of BlockService",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
