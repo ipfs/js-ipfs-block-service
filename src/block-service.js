@@ -6,7 +6,7 @@ const async = require('async')
 // datastore and may retrieve data from a remote Exchange.
 // It uses an internal `datastore.Datastore` instance to store values.
 function BlockService (ipfsRepo, exchange) {
-  this.addBlock = ipfsRepo.datastore.put.bind(ipfsRepo.datastore)
+  this.addBlock = ipfsRepo.datastore.put
 
   this.addBlocks = (blocks, callback) => {
     if (!Array.isArray(blocks)) {
@@ -18,7 +18,7 @@ function BlockService (ipfsRepo, exchange) {
     }, callback)
   }
 
-  this.getBlock = ipfsRepo.datastore.get.bind(ipfsRepo.datastore)
+  this.getBlock = ipfsRepo.datastore.get
 
   this.getBlocks = (multihashes, extension, callback) => {
     if (typeof extension === 'function') {
@@ -45,7 +45,7 @@ function BlockService (ipfsRepo, exchange) {
     })
   }
 
-  this.deleteBlock = ipfsRepo.datastore.delete.bind(ipfsRepo.datastore)
+  this.deleteBlock = ipfsRepo.datastore.delete
 
   this.deleteBlocks = (multihashes, extension, callback) => {
     if (typeof extension === 'function') {
