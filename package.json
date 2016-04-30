@@ -47,7 +47,7 @@
     "lodash": "^4.8.2",
     "ncp": "^2.0.0",
     "pre-commit": "^1.1.2",
-    "ipfs-block": "^0.2.0",
+    "ipfs-block": "^0.2.2",
     "rimraf": "^2.5.1"
   },
   "dependencies": {
