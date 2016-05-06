@@ -15,6 +15,10 @@ module.exports = class BlockService {
     this._bitswap = bitswap
   }
 
+  goOffline () {
+    this._bitswap = null
+  }
+
   isOnline () {
     return this._bitswap != null
   }

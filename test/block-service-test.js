@@ -213,6 +213,14 @@ module.exports = (repo) => {
           })
         })
       })
+
+      it('goes offline', () => {
+        bs = new BlockService(repo)
+        bs.goOnline({})
+        expect(bs.isOnline()).to.be.eql(true)
+        bs.goOffline()
+        expect(bs.isOnline()).to.be.eql(false)
+      })
     })
 
     describe('online', () => {
