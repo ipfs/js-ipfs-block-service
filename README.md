@@ -17,8 +17,7 @@ IPFS Block Service JavaScript Implementation
 
 **BlockService** - A BlockService is a content-addressable store for blocks,
 providing an API for adding, deleting, and retrieving blocks. A BlockService is
-backed by an [IPFS Repo][repo] as its datastore for blocks, and uses an [IPFS
-Exchange][bitswap] implementation to fetch blocks from the network.
+backed by an [IPFS Repo][repo] as its datastore for blocks, and uses [Bitswap][bitswap] to fetch blocks from the network.
 
 ```markdown
 ┌────────────────────┐
@@ -27,9 +26,9 @@ Exchange][bitswap] implementation to fetch blocks from the network.
            │
      ┌─────┴─────┐
      ▼           ▼
-┌─────────┐ ┌────────┐
-│IPFS Repo│ │Exchange│
-└─────────┘ └────────┘
+┌─────────┐ ┌───────┐
+│IPFS Repo│ |Bitswap│
+└─────────┘ └───────┘
 ```
 
 ## Example
@@ -99,7 +98,7 @@ var BlockService = require('ipfs-block-service')
 
 ### Browser: `<script>` Tag
 
-Loading this module through a script tag will make the `Unixfs` obj available in
+Loading this module through a script tag will make the `IpfsBlockService` obj available in
 the global namespace.
 
 ```html
@@ -108,71 +107,11 @@ the global namespace.
 <script src="https://npmcdn.com/ipfs-block-service/dist/index.js"></script>
 ```
 
-## API
-
-```js
-const BlockService = require('ipfs-block-service')
-```
-
-### var bs = new BlockService(repo[, exchange])
-
-Creates a new block service backed by [IPFS Repo][repo] `repo` for storage, and
-[IPFS Exchange][bitswap] for retrieving blocks from the network. Providing an
-`exchange` is optional.
-
-#### bs.addBlock(block, callback(err))
-
-Asynchronously adds a block instance to the underlying repo.
-
-#### bs.addBlocks(blocks, callback(err))
-
-Asynchronously adds an array of block instances to the underlying repo.
-
-*Does not guarantee atomicity.*
-
-#### bs.getBlock(multihash, callback(err, block))
-
-Asynchronously returns the block whose content multihash matches `multihash`.
-Returns an error (`err.code === 'ENOENT'`) if the block does not exist.
-
-If the block could not be found, expect `err.code` to be `'ENOENT'`.
-
-#### bs.getBlocks(multihashes, callback(err, blocks))
-
-Asynchronously returns the blocks whose content multihashes match the array
-`multihashes`.
-
-`blocks` is an object that maps each `multihash` to an object of the form
-
-```js
-{
-  err: Error
-  block: Block
-}
-```
-
-Expect `blocks[multihash].err.code === 'ENOENT'`  and `blocks[multihash].block
-=== null` if a block did not exist.
-
-*Does not guarantee atomicity.*
-
-#### bs.deleteBlock(multihash, callback(err))
-
-Asynchronously deletes the block from the store with content multihash matching
-`multihash`, if it exists.
-
-#### bs.deleteBlocks(multihashes, callback(err))
-
-Asynchronously deletes all blocks from the store with content multihashes matching
-from the array `multihashes`.
-
-*Does not guarantee atomicity.*
+You can find the [API documentation here](API.md)
 
 ## License
 
 MIT
 
 [ipfs]: https://ipfs.io
-[repo]: https://github.com/ipfs/specs/tree/master/repo
 [bitswap]: https://github.com/ipfs/specs/tree/master/bitswap
-[multihash]: https://github.com/jbenet/js-multihash
