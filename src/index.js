@@ -1,6 +1,6 @@
 'use strict'
 
-const async = require('async')
+const parallelLimit = require('run-parallel-limit')
 
 // BlockService is a hybrid block datastore. It stores data in a local
 // datastore and may retrieve data from a remote Exchange.
@@ -41,9 +41,9 @@ module.exports = class BlockService {
       return callback(new Error('expects an array of Blocks'))
     }
 
-    async.eachLimit(blocks, 100, (block, next) => {
+    parallelLimit(blocks.map((block) => (next) => {
       this.addBlock(block, next)
-    }, callback)
+    }), 100, callback)
   }
 
   getBlock (key, extension, callback) {
@@ -71,7 +71,7 @@ module.exports = class BlockService {
 
     var results = {}
 
-    async.eachLimit(multihashes, 100, (multihash, next) => {
+    parallelLimit(multihashes.map((multihash) => (next) => {
       this.getBlock(multihash, extension, (err, block) => {
         results[multihash] = {
           err: err,
@@ -79,7 +79,7 @@ module.exports = class BlockService {
         }
         next()
       })
-    }, (err) => {
+    }), 100, (err) => {
       callback(err, results)
     })
   }
@@ -98,9 +98,9 @@ module.exports = class BlockService {
       return callback(new Error('Invalid batch of multihashes'))
     }
 
-    async.eachLimit(multihashes, 100, (multihash, next) => {
+    parallelLimit(multihashes.map((multihash) => (next) => {
       this.deleteBlock(multihash, extension, next)
-    }, (err) => {
+    }), 100, (err) => {
       callback(err)
     })
   }
