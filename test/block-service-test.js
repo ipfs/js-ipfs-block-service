@@ -3,6 +3,7 @@
 
 const expect = require('chai').expect
 const Block = require('ipfs-block')
+const mh = require('multihashes')
 const BlockService = require('../src')
 
 module.exports = (repo) => {
@@ -93,15 +94,15 @@ module.exports = (repo) => {
           bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
             expect(err).to.not.exist
             expect(Object.keys(blocks)).to.have.lengthOf(3)
-            expect(blocks[b1.key]).to.exist
-            expect(blocks[b1.key].err).to.not.exist
-            expect(blocks[b1.key].block.data).to.deep.equal(b1.data)
-            expect(blocks[b2.key]).to.exist
-            expect(blocks[b2.key].err).to.not.exist
-            expect(blocks[b2.key].block.data).to.deep.equal(b2.data)
-            expect(blocks[b3.key]).to.exist
-            expect(blocks[b3.key].err).to.not.exist
-            expect(blocks[b3.key].block.data).to.deep.equal(b3.data)
+            expect(blocks[mh.toB58String(b1.key)]).to.exist
+            expect(blocks[mh.toB58String(b1.key)].error).to.not.exist
+            expect(blocks[mh.toB58String(b1.key)].block.data).to.deep.equal(b1.data)
+            expect(blocks[mh.toB58String(b2.key)]).to.exist
+            expect(blocks[mh.toB58String(b2.key)].error).to.not.exist
+            expect(blocks[mh.toB58String(b2.key)].block.data).to.deep.equal(b2.data)
+            expect(blocks[mh.toB58String(b3.key)]).to.exist
+            expect(blocks[mh.toB58String(b3.key)].error).to.not.exist
+            expect(blocks[mh.toB58String(b3.key)].block.data).to.deep.equal(b3.data)
             done()
           })
         })
@@ -118,15 +119,15 @@ module.exports = (repo) => {
           bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
             expect(err).to.not.exist
             expect(Object.keys(blocks)).to.have.lengthOf(3)
-            expect(blocks[b1.key]).to.exist
-            expect(blocks[b1.key].err).to.not.exist
-            expect(blocks[b1.key].block.data).to.deep.equal(b1.data)
-            expect(blocks[b2.key]).to.exist
-            expect(blocks[b2.key].err).to.exist
-            expect(blocks[b2.key].block).to.not.exist
-            expect(blocks[b3.key]).to.exist
-            expect(blocks[b3.key].err).to.not.exist
-            expect(blocks[b3.key].block.data).to.deep.equal(b3.data)
+            expect(blocks[mh.toB58String(b1.key)]).to.exist
+            expect(blocks[mh.toB58String(b1.key)].error).to.not.exist
+            expect(blocks[mh.toB58String(b1.key)].block.data).to.deep.equal(b1.data)
+            expect(blocks[mh.toB58String(b2.key)]).to.exist
+            expect(blocks[mh.toB58String(b2.key)].error).to.exist
+            expect(blocks[mh.toB58String(b2.key)].block).to.not.exist
+            expect(blocks[mh.toB58String(b3.key)]).to.exist
+            expect(blocks[mh.toB58String(b3.key)].error).to.not.exist
+            expect(blocks[mh.toB58String(b3.key)].block.data).to.deep.equal(b3.data)
             done()
           })
         })
@@ -256,6 +257,28 @@ module.exports = (repo) => {
         }
         bs.goOnline(bitswap)
         bs.addBlock(new Block('secret sauce'), done)
+      })
+
+      it('getBlocks through bitswap', (done) => {
+        const b1 = new Block('secret sauce 1')
+        const b2 = new Block('secret sauce 2')
+
+        const bitswap = {
+          getBlocks (keys, cb) {
+            cb({
+              [mh.toB58String(b1.key)]: {block: b1},
+              [mh.toB58String(b2.key)]: {block: b2}
+            })
+          }
+        }
+
+        bs.goOnline(bitswap)
+        bs.getBlocks([b1.key, b2.key], (err, results) => {
+          expect(err).to.not.exist
+          expect(results[mh.toB58String(b1.key)].block).to.be.eql(b1)
+          expect(results[mh.toB58String(b2.key)].block).to.be.eql(b2)
+          done()
+        })
       })
     })
   })
