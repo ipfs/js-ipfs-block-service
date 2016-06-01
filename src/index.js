@@ -1,6 +1,7 @@
 'use strict'
 
 const parallelLimit = require('run-parallel-limit')
+const mh = require('multihashes')
 
 // BlockService is a hybrid block datastore. It stores data in a local
 // datastore and may retrieve data from a remote Exchange.
@@ -69,14 +70,17 @@ module.exports = class BlockService {
       return callback(new Error('Invalid batch of multihashes'))
     }
 
-    var results = {}
+    if (this.isOnline()) {
+      this._bitswap.getBlocks(multihashes, (results) => {
+        callback(null, results)
+      })
+      return
+    }
 
-    parallelLimit(multihashes.map((multihash) => (next) => {
-      this.getBlock(multihash, extension, (err, block) => {
-        results[multihash] = {
-          err: err,
-          block: block
-        }
+    const results = {}
+    parallelLimit(multihashes.map((key) => (next) => {
+      this._repo.datastore.get(key, extension, (error, block) => {
+        results[mh.toB58String(key)] = {error, block}
         next()
       })
     }), 100, (err) => {
