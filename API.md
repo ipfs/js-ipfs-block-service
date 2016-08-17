@@ -6,9 +6,13 @@ const BlockService = require('ipfs-block-service')
 
 ### `new BlockService(repo)`
 
+- `repo: Repo`
+
 Creates a new block service backed by [IPFS Repo][repo] `repo` for storage.
 
 ### `goOnline(bitswap)`
+
+- `bitswap: Bitswap`
 
 Add a bitswap instance that communicates with the network to retreive blocks
 that are not in the local store.
@@ -24,53 +28,40 @@ Remove the bitswap instance and fall back to offline mode.
 
 Returns a `Boolean` indicating if the block service is online or not.
 
-### `addBlock(block, callback(err))`
+### `put(block, callback)`
+
+- `block: Block`
+- `callback: Function`
 
 Asynchronously adds a block instance to the underlying repo.
 
-### `addBlocks(blocks, callback(err))`
+### `putStream()`
 
-Asynchronously adds an array of block instances to the underlying repo.
+Returns a through pull-stream, which `Block`s can be written to, and
+that emits the meta data about the written block.
 
-*Does not guarantee atomicity.*
+### `get(multihash [, extension], callback)`
 
-### `getBlock(multihash, callback(err, block))`
+- `multihash: Multihash`
+- `extension: String`, defaults to 'data'
+- `callback: Function`
 
 Asynchronously returns the block whose content multihash matches `multihash`.
-Returns an error (`err.code === 'ENOENT'`) if the block does not exist.
 
-If the block could not be found, expect `err.code` to be `'ENOENT'`.
+### `getStream(multihash [, extension])`
 
-### `getBlocks(multihashes, callback(err, blocks))`
+- `multihash: Multihash`
+- `extension: String`, defaults to 'data'
 
-Asynchronously returns the blocks whose content multihashes match the array
-`multihashes`.
+Returns a source pull-stream, which emits the requested block.
 
-`blocks` is an object that maps each `multihash` to an object of the form
+### `delete(multihashes, [, extension], callback)`
 
-```js
-{
-  err: Error
-  block: Block
-}
-```
+- `multihashes: Multihash|[]Multihash`
+- `extension: String`, defaults to 'data'- `extension: String`, defaults to 'data'
+- `callback: Function`
 
-Expect `blocks[multihash].err.code === 'ENOENT'`  and `blocks[multihash].block
-=== null` if a block did not exist.
+Deletes all blocks referenced by multihashes.
 
-*Does not guarantee atomicity.*
-
-### `deleteBlock(multihash, callback(err))`
-
-Asynchronously deletes the block from the store with content multihash matching
-`multihash`, if it exists.
-
-### `bs.deleteBlocks(multihashes, callback(err))`
-
-Asynchronously deletes all blocks from the store with content multihashes matching
-from the array `multihashes`.
-
-*Does not guarantee atomicity.*
-
-[multihash]: https://github.com/jbenet/js-multihash
+[multihash]: https://github.com/multiformats/js-multihash
 [repo]: https://github.com/ipfs/specs/tree/master/repo
