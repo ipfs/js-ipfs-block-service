@@ -3,7 +3,10 @@
 
 const expect = require('chai').expect
 const Block = require('ipfs-block')
-const mh = require('multihashes')
+const pull = require('pull-stream')
+const _ = require('lodash')
+const series = require('run-series')
+
 const BlockService = require('../src')
 
 module.exports = (repo) => {
@@ -17,33 +20,33 @@ module.exports = (repo) => {
     describe('offline', () => {
       it('store and get a block', (done) => {
         const b = new Block('A random data block')
-        bs.addBlock(b, (err) => {
-          expect(err).to.not.exist
-          bs.getBlock(b.key, (err, block) => {
-            expect(err).to.not.exist
-            expect(b.data.equals(block.data)).to.equal(true)
-            expect(b.key.equals(block.key)).to.equal(true)
-            done()
+
+        series([
+          (cb) => bs.put(b, cb),
+          (cb) => bs.get(b.key, (err, block) => {
+            if (err) return cb(err)
+            expect(b).to.be.eql(block)
+            cb()
           })
-        })
+        ], done)
       })
 
       it('store and get a block, with custom extension', (done) => {
         const b = new Block('A random data block 2', 'ext')
-        bs.addBlock(b, (err) => {
-          expect(err).to.not.exist
-          bs.getBlock(b.key, 'ext', (err, block) => {
-            expect(err).to.not.exist
-            expect(b.data.equals(block.data)).to.equal(true)
-            expect(b.key.equals(block.key)).to.equal(true)
-            done()
+
+        series([
+          (cb) => bs.put(b, cb),
+          (cb) => bs.get(b.key, 'ext', (err, block) => {
+            if (err) return cb(err)
+            expect(b).to.be.eql(block)
+            cb()
           })
-        })
+        ], done)
       })
 
       it('get a non existent block', (done) => {
         const b = new Block('Not stored')
-        bs.getBlock(b.key, (err, block) => {
+        bs.get(b.key, (err, block) => {
           expect(err).to.exist
           done()
         })
@@ -54,30 +57,19 @@ module.exports = (repo) => {
         const b2 = new Block('2')
         const b3 = new Block('3')
 
-        bs.addBlocks([b1, b2, b3], (err) => {
-          expect(err).to.not.exist
-          done()
-        })
+        pull(
+          pull.values([b1, b2, b3]),
+          bs.putStream(),
+          pull.collect((err, meta) => {
+            expect(err).to.not.exist
+            expect(meta).to.have.length(3)
+            done()
+          })
+        )
       })
 
-      it('addBlocks: bad invocation', (done) => {
-        const b1 = new Block('1')
-
-        bs.addBlocks(b1, (err) => {
-          expect(err).to.be.an('error')
-          done()
-        })
-      })
-
-      it('getBlock: bad invocation', (done) => {
-        bs.getBlock(null, (err) => {
-          expect(err).to.be.an('error')
-          done()
-        })
-      })
-
-      it('getBlocks: bad invocation', (done) => {
-        bs.getBlocks(null, 'protobuf', (err) => {
+      it('get: bad invocation', (done) => {
+        bs.get(null, (err) => {
           expect(err).to.be.an('error')
           done()
         })
@@ -88,58 +80,37 @@ module.exports = (repo) => {
         const b2 = new Block('2')
         const b3 = new Block('3')
 
-        bs.addBlocks([b1, b2, b3], (err) => {
-          expect(err).to.not.exist
-
-          bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
+        pull(
+          pull.values([b1, b2, b3]),
+          bs.putStream(),
+          pull.onEnd((err) => {
             expect(err).to.not.exist
-            expect(Object.keys(blocks)).to.have.lengthOf(3)
-            expect(blocks[mh.toB58String(b1.key)]).to.exist
-            expect(blocks[mh.toB58String(b1.key)].error).to.not.exist
-            expect(blocks[mh.toB58String(b1.key)].block.data).to.deep.equal(b1.data)
-            expect(blocks[mh.toB58String(b2.key)]).to.exist
-            expect(blocks[mh.toB58String(b2.key)].error).to.not.exist
-            expect(blocks[mh.toB58String(b2.key)].block.data).to.deep.equal(b2.data)
-            expect(blocks[mh.toB58String(b3.key)]).to.exist
-            expect(blocks[mh.toB58String(b3.key)].error).to.not.exist
-            expect(blocks[mh.toB58String(b3.key)].block.data).to.deep.equal(b3.data)
-            done()
+            getAndAssert()
           })
-        })
-      })
+        )
 
-      it('get many blocks: partial success', (done) => {
-        const b1 = new Block('a1')
-        const b2 = new Block('a2')
-        const b3 = new Block('a3')
+        function getAndAssert () {
+          pull(
+            pull.values([b1.key, b2.key, b3.key]),
+            pull.map((key) => bs.getStream(key)),
+            pull.flatten(),
+            pull.collect((err, blocks) => {
+              expect(err).to.not.exist
 
-        bs.addBlocks([b1, b3], (err) => {
-          expect(err).to.not.exist
-
-          bs.getBlocks([b1.key, b2.key, b3.key], (err, blocks) => {
-            expect(err).to.not.exist
-            expect(Object.keys(blocks)).to.have.lengthOf(3)
-            expect(blocks[mh.toB58String(b1.key)]).to.exist
-            expect(blocks[mh.toB58String(b1.key)].error).to.not.exist
-            expect(blocks[mh.toB58String(b1.key)].block.data).to.deep.equal(b1.data)
-            expect(blocks[mh.toB58String(b2.key)]).to.exist
-            expect(blocks[mh.toB58String(b2.key)].error).to.exist
-            expect(blocks[mh.toB58String(b2.key)].block).to.not.exist
-            expect(blocks[mh.toB58String(b3.key)]).to.exist
-            expect(blocks[mh.toB58String(b3.key)].error).to.not.exist
-            expect(blocks[mh.toB58String(b3.key)].block.data).to.deep.equal(b3.data)
-            done()
-          })
-        })
+              expect(blocks).to.be.eql([b1, b2, b3])
+              done()
+            })
+          )
+        }
       })
 
       it('delete a block', (done) => {
         const b = new Block('Will not live that much')
-        bs.addBlock(b, (err) => {
+        bs.put(b, (err) => {
           expect(err).to.not.exist
-          bs.deleteBlock(b.key, (err) => {
+          bs.delete(b.key, (err) => {
             expect(err).to.not.exist
-            bs.getBlock(b.key, (err, block) => {
+            bs.get(b.key, (err, block) => {
               expect(err).to.exist
               done()
             })
@@ -147,8 +118,8 @@ module.exports = (repo) => {
         })
       })
 
-      it('deleteBlock: bad invocation', (done) => {
-        bs.deleteBlock(null, (err) => {
+      it('delete: bad invocation', (done) => {
+        bs.delete(null, (err) => {
           expect(err).to.be.an('error')
           done()
         })
@@ -156,11 +127,11 @@ module.exports = (repo) => {
 
       it('delete a block, with custom extension', (done) => {
         const b = new Block('Will not live that much', 'ext')
-        bs.addBlock(b, (err) => {
+        bs.put(b, (err) => {
           expect(err).to.not.exist
-          bs.deleteBlock(b.key, 'ext', (err) => {
+          bs.delete(b.key, 'ext', (err) => {
             expect(err).to.not.exist
-            bs.getBlock(b.key, 'ext', (err, block) => {
+            bs.get(b.key, 'ext', (err, block) => {
               expect(err).to.exist
               done()
             })
@@ -170,7 +141,7 @@ module.exports = (repo) => {
 
       it('delete a non existent block', (done) => {
         const b = new Block('I do not exist')
-        bs.deleteBlock(b.key, (err) => {
+        bs.delete(b.key, (err) => {
           expect(err).to.not.exist
           done()
         })
@@ -181,15 +152,8 @@ module.exports = (repo) => {
         const b2 = new Block('2')
         const b3 = new Block('3')
 
-        bs.deleteBlocks([b1, b2, b3], 'data', (err) => {
+        bs.delete([b1, b2, b3], 'data', (err) => {
           expect(err).to.not.exist
-          done()
-        })
-      })
-
-      it('deleteBlocks: bad invocation', (done) => {
-        bs.deleteBlocks(null, (err) => {
-          expect(err).to.be.an('error')
           done()
         })
       })
@@ -197,22 +161,29 @@ module.exports = (repo) => {
       it('stores and gets lots of blocks', function (done) {
         this.timeout(60 * 1000)
 
-        const blocks = []
-        const count = 1000
-        while (blocks.length < count) {
-          blocks.push(new Block('hello-' + Math.random()))
-        }
-
-        bs.addBlocks(blocks, (err) => {
-          expect(err).to.not.exist
-
-          bs.getBlocks(blocks.map((b) => b.key), (err, res) => {
-            expect(err).to.not.exist
-            expect(Object.keys(res)).to.have.length(count)
-
-            done()
-          })
+        const blocks = _.range(1000).map((i) => {
+          return new Block(`hello-${i}-${Math.random()}`)
         })
+
+        pull(
+          pull.values(blocks),
+          bs.putStream(),
+          pull.onEnd((err) => {
+            expect(err).to.not.exist
+
+            pull(
+              pull.values(blocks),
+              pull.map((b) => b.key),
+              pull.map((key) => bs.getStream(key)),
+              pull.flatten(),
+              pull.collect((err, res) => {
+                expect(err).to.not.exist
+                expect(res).to.be.eql(blocks)
+                done()
+              })
+            )
+          })
+        )
       })
 
       it('goes offline', () => {
@@ -236,13 +207,13 @@ module.exports = (repo) => {
 
       it('retrieves a block through bitswap', (done) => {
         const bitswap = {
-          getBlock (key, cb) {
-            cb(null, new Block(key))
+          getStream (key) {
+            return pull.values([new Block(key)])
           }
         }
         bs.goOnline(bitswap)
 
-        bs.getBlock('secret', (err, res) => {
+        bs.get('secret', (err, res) => {
           expect(err).to.not.exist
           expect(res).to.be.eql(new Block('secret'))
           done()
@@ -251,34 +222,32 @@ module.exports = (repo) => {
 
       it('puts the block through bitswap', (done) => {
         const bitswap = {
-          hasBlock (block, cb) {
-            cb()
+          putStream () {
+            return pull.through(() => {})
           }
         }
         bs.goOnline(bitswap)
-        bs.addBlock(new Block('secret sauce'), done)
+        bs.put(new Block('secret sauce'), done)
       })
 
-      it('getBlocks through bitswap', (done) => {
-        const b1 = new Block('secret sauce 1')
-        const b2 = new Block('secret sauce 2')
+      it('getStream through bitswap', (done) => {
+        const b = new Block('secret sauce 1')
 
         const bitswap = {
-          getBlocks (keys, cb) {
-            cb({
-              [mh.toB58String(b1.key)]: {block: b1},
-              [mh.toB58String(b2.key)]: {block: b2}
-            })
+          getStream () {
+            return pull.values([b])
           }
         }
 
         bs.goOnline(bitswap)
-        bs.getBlocks([b1.key, b2.key], (err, results) => {
-          expect(err).to.not.exist
-          expect(results[mh.toB58String(b1.key)].block).to.be.eql(b1)
-          expect(results[mh.toB58String(b2.key)].block).to.be.eql(b2)
-          done()
-        })
+        pull(
+          bs.getStream(b.key),
+          pull.collect((err, res) => {
+            expect(err).to.not.exist
+            expect(res).to.be.eql([b])
+            done()
+          })
+        )
       })
     })
   })
