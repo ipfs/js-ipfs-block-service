@@ -31,7 +31,9 @@ module.exports = class BlockService {
     }
 
     pull(
-      pull.values([block]),
+      pull.values([
+        block
+      ]),
       this.putStream(),
       pull.onEnd(callback)
     )
@@ -42,44 +44,41 @@ module.exports = class BlockService {
       return this._bitswap.putStream()
     }
 
-    return this._repo.blockstore.putStream()
+    return pull(
+      pull.map((block) => {
+        return { data: block.data, key: block.key() }
+      }),
+      this._repo.blockstore.putStream()
+    )
   }
 
-  get (key, extension, callback) {
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
-    }
-
+  get (key, callback) {
     pull(
-      this.getStream(key, extension),
+      this.getStream(key),
       pull.collect((err, result) => {
-        if (err) return callback(err)
+        if (err) {
+          return callback(err)
+        }
         callback(null, result[0])
       })
     )
   }
 
-  getStream (key, extension) {
+  getStream (key) {
     if (this.isOnline()) {
       return this._bitswap.getStream(key)
     }
 
-    return this._repo.blockstore.getStream(key, extension)
+    return this._repo.blockstore.getStream(key)
   }
 
-  delete (keys, extension, callback) {
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
-    }
-
+  delete (keys, callback) {
     if (!Array.isArray(keys)) {
       keys = [keys]
     }
 
     parallelLimit(keys.map((key) => (next) => {
-      this._repo.blockstore.delete(key, extension, next)
+      this._repo.blockstore.delete(key, next)
     }), 100, callback)
   }
 }
