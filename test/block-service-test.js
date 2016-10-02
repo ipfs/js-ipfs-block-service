@@ -24,7 +24,7 @@ module.exports = (repo) => {
         const cid = new CID(b.key())
 
         series([
-          (cb) => bs.put(b, cb),
+          (cb) => bs.put({ block: b, cid: cid }, cb),
           (cb) => bs.get(cid, (err, block) => {
             if (err) {
               return cb(err)
@@ -52,9 +52,9 @@ module.exports = (repo) => {
 
         pull(
           pull.values([
-            b1,
-            b2,
-            b3
+            { block: b1, cid: new CID(b1.key()) },
+            { block: b2, cid: new CID(b2.key()) },
+            { block: b3, cid: new CID(b3.key()) }
           ]),
           bs.putStream(),
           pull.collect((err, meta) => {
@@ -72,9 +72,9 @@ module.exports = (repo) => {
 
         pull(
           pull.values([
-            b1,
-            b2,
-            b3
+            { block: b1, cid: new CID(b1.key()) },
+            { block: b2, cid: new CID(b2.key()) },
+            { block: b3, cid: new CID(b3.key()) }
           ]),
           bs.putStream(),
           pull.onEnd((err) => {
@@ -110,7 +110,7 @@ module.exports = (repo) => {
 
       it('delete a block', (done) => {
         const b = new Block('Will not live that much')
-        bs.put(b, (err) => {
+        bs.put({ block: b, cid: new CID(b.key()) }, (err) => {
           expect(err).to.not.exist
           const cid = new CID(b.key())
           bs.delete(cid, (err) => {
@@ -156,6 +156,9 @@ module.exports = (repo) => {
 
         pull(
           pull.values(blocks),
+          pull.map((block) => {
+            return { block: block, cid: new CID(block.key()) }
+          }),
           bs.putStream(),
           pull.onEnd((err) => {
             expect(err).to.not.exist

@@ -24,15 +24,19 @@ module.exports = class BlockService {
     return this._bitswap != null
   }
 
-  put (block, callback) {
+  // Note: we have to pass the CID, so that bitswap can then use it for
+  // the smart selectors. For now, passing the CID is used so that we know
+  // the right multihash, this means that now we have multiple hashes official
+  // support \o/
+  put (blockAndCID, callback) {
     callback = callback || (() => {})
-    if (!block) {
-      return callback(new Error('Missing block'))
+    if (!blockAndCID) {
+      return callback(new Error('Missing block and CID'))
     }
 
     pull(
       pull.values([
-        block
+        blockAndCID
       ]),
       this.putStream(),
       pull.onEnd(callback)
@@ -40,15 +44,21 @@ module.exports = class BlockService {
   }
 
   putStream () {
+    let ps
     if (this.isOnline()) {
-      return this._bitswap.putStream()
+      ps = this._bitswap.putStream()
+    } else {
+      ps = this._repo.blockstore.putStream()
     }
 
     return pull(
-      pull.map((block) => {
-        return { data: block.data, key: block.key() }
+      pull.map((blockAndCID) => {
+        return {
+          data: blockAndCID.block.data,
+          key: blockAndCID.cid.multihash
+        }
       }),
-      this._repo.blockstore.putStream()
+      ps
     )
   }
 
