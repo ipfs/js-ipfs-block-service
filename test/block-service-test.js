@@ -6,6 +6,7 @@ const Block = require('ipfs-block')
 const pull = require('pull-stream')
 const _ = require('lodash')
 const series = require('run-series')
+const CID = require('cids')
 
 const BlockService = require('../src')
 
@@ -20,10 +21,11 @@ module.exports = (repo) => {
     describe('offline', () => {
       it('store and get a block', (done) => {
         const b = new Block('A random data block')
+        const cid = new CID(b.key())
 
         series([
           (cb) => bs.put(b, cb),
-          (cb) => bs.get(b.key(), (err, block) => {
+          (cb) => bs.get(cid, (err, block) => {
             if (err) {
               return cb(err)
             }
@@ -35,7 +37,9 @@ module.exports = (repo) => {
 
       it('get a non existent block', (done) => {
         const b = new Block('Not stored')
-        bs.get(b.key(), (err, block) => {
+        const cid = new CID(b.key())
+
+        bs.get(cid, (err, block) => {
           expect(err).to.exist
           done()
         })
@@ -59,13 +63,6 @@ module.exports = (repo) => {
             done()
           })
         )
-      })
-
-      it('get: bad invocation', (done) => {
-        bs.get(null, (err) => {
-          expect(err).to.be.an('error')
-          done()
-        })
       })
 
       it('get many blocks', (done) => {
@@ -94,7 +91,8 @@ module.exports = (repo) => {
               b3.key()
             ]),
             pull.map((key) => {
-              return bs.getStream(key)
+              const cid = new CID(key)
+              return bs.getStream(cid)
             }),
             pull.flatten(),
             pull.collect((err, blocks) => {
@@ -114,9 +112,10 @@ module.exports = (repo) => {
         const b = new Block('Will not live that much')
         bs.put(b, (err) => {
           expect(err).to.not.exist
-          bs.delete(b.key(), (err) => {
+          const cid = new CID(b.key())
+          bs.delete(cid, (err) => {
             expect(err).to.not.exist
-            bs.get(b.key(), (err, block) => {
+            bs.get(cid, (err, block) => {
               expect(err).to.exist
               done()
             })
@@ -124,16 +123,10 @@ module.exports = (repo) => {
         })
       })
 
-      it('delete: bad invocation', (done) => {
-        bs.delete(null, (err) => {
-          expect(err).to.be.an('error')
-          done()
-        })
-      })
-
       it('delete a non existent block', (done) => {
         const b = new Block('I do not exist')
-        bs.delete(b.key(), (err) => {
+        const cid = new CID(b.key())
+        bs.delete(cid, (err) => {
           expect(err).to.not.exist
           done()
         })
@@ -145,9 +138,9 @@ module.exports = (repo) => {
         const b3 = new Block('3')
 
         bs.delete([
-          b1.key(),
-          b2.key(),
-          b3.key()
+          new CID(b1.key()),
+          new CID(b2.key()),
+          new CID(b3.key())
         ], (err) => {
           expect(err).to.not.exist
           done()
@@ -173,7 +166,8 @@ module.exports = (repo) => {
                 return block.key()
               }),
               pull.map((key) => {
-                return bs.getStream(key)
+                const cid = new CID(key)
+                return bs.getStream(cid)
               }),
               pull.flatten(),
               pull.collect((err, retrievedBlocks) => {

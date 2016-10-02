@@ -52,9 +52,9 @@ module.exports = class BlockService {
     )
   }
 
-  get (key, callback) {
+  get (cid, callback) {
     pull(
-      this.getStream(key),
+      this.getStream(cid),
       pull.collect((err, result) => {
         if (err) {
           return callback(err)
@@ -64,21 +64,21 @@ module.exports = class BlockService {
     )
   }
 
-  getStream (key) {
+  getStream (cid) {
     if (this.isOnline()) {
-      return this._bitswap.getStream(key)
+      return this._bitswap.getStream(cid)
     }
 
-    return this._repo.blockstore.getStream(key)
+    return this._repo.blockstore.getStream(cid.multihash)
   }
 
-  delete (keys, callback) {
-    if (!Array.isArray(keys)) {
-      keys = [keys]
+  delete (cids, callback) {
+    if (!Array.isArray(cids)) {
+      cids = [cids]
     }
 
-    parallelLimit(keys.map((key) => (next) => {
-      this._repo.blockstore.delete(key, next)
+    parallelLimit(cids.map((cid) => (next) => {
+      this._repo.blockstore.delete(cid.multihash, next)
     }), 100, callback)
   }
 }
