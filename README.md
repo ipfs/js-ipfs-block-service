@@ -64,7 +64,7 @@ const BlockService = require('ipfs-block-service')
 const BlockService = require('ipfs-block-service')
 const Block = require('ipfs-block')
 const IPFSRepo = require('ipfs-repo')  // storage repo
-const Store = require(interface-pull-blob-store')  // in-memory store
+const Store = require('interface-pull-blob-store')  // in-memory store
 
 // setup a repo
 var repo = new IPFSRepo('example', { stores: Store })
