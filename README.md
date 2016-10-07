@@ -78,8 +78,8 @@ console.log(block.key)
 const bs = new BlockService(repo)
 
 // add the block, then retrieve it
-bs.addBlock(block, function (err) {
-  bs.getBlock(block.key, function (err, b) {
+bs.put(block, function (err) {
+  bs.get(block.key, function (err, b) {
     console.log(block.data.toString() === b.data.toString())
   })
 })
