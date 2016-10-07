@@ -70,7 +70,7 @@ const Store = require('interface-pull-blob-store')  // in-memory store
 var repo = new IPFSRepo('example', { stores: Store })
 
 // create a block
-const block = new Block('hello world)
+const block = new Block('hello world')
 console.log(block.data)
 console.log(block.key)
 
