@@ -64,13 +64,13 @@ const BlockService = require('ipfs-block-service')
 const BlockService = require('ipfs-block-service')
 const Block = require('ipfs-block')
 const IPFSRepo = require('ipfs-repo')  // storage repo
-const Store = require(interface-pull-blob-store')  // in-memory store
+const Store = require('interface-pull-blob-store')  // in-memory store
 
 // setup a repo
 var repo = new IPFSRepo('example', { stores: Store })
 
 // create a block
-const block = new Block('hello world)
+const block = new Block('hello world')
 console.log(block.data)
 console.log(block.key)
 
@@ -78,8 +78,8 @@ console.log(block.key)
 const bs = new BlockService(repo)
 
 // add the block, then retrieve it
-bs.addBlock(block, function (err) {
-  bs.getBlock(block.key, function (err, b) {
+bs.put(block, function (err) {
+  bs.get(block.key, function (err, b) {
     console.log(block.data.toString() === b.data.toString())
   })
 })
