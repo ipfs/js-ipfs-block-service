@@ -192,7 +192,7 @@ module.exports = (repo) => {
       })
     })
 
-    describe.skip('online', () => {
+    describe('online', () => {
       beforeEach(() => {
         bs = new BlockService(repo)
       })
@@ -203,16 +203,20 @@ module.exports = (repo) => {
       })
 
       it('retrieves a block through bitswap', (done) => {
+        // returns a block with a value equal to its key
         const bitswap = {
           getStream (key) {
-            return pull.values([new Block(key)])
+            return pull.values([
+              new Block(key)
+            ])
           }
         }
+
         bs.goOnline(bitswap)
 
-        bs.get('secret', (err, res) => {
+        bs.get('secret', (err, block) => {
           expect(err).to.not.exist
-          expect(res).to.be.eql(new Block('secret'))
+          expect(block.data).to.be.eql(new Block('secret').data)
           done()
         })
       })
@@ -224,11 +228,18 @@ module.exports = (repo) => {
           }
         }
         bs.goOnline(bitswap)
-        bs.put(new Block('secret sauce'), done)
+
+        const block = new Block('secret sauce')
+
+        bs.put({
+          block: block,
+          cid: new CID(block.key('sha2-256'))
+        }, done)
       })
 
       it('getStream through bitswap', (done) => {
         const b = new Block('secret sauce 1')
+        const cid = new CID(b.key('sha2-256'))
 
         const bitswap = {
           getStream () {
@@ -237,11 +248,13 @@ module.exports = (repo) => {
         }
 
         bs.goOnline(bitswap)
+
         pull(
-          bs.getStream(b.key),
-          pull.collect((err, res) => {
+          bs.getStream(cid),
+          pull.collect((err, blocks) => {
             expect(err).to.not.exist
-            expect(res).to.be.eql([b])
+            expect(blocks[0].data).to.be.eql(b.data)
+            expect(blocks[0].key('sha2-256')).to.be.eql(cid.multihash)
             done()
           })
         )

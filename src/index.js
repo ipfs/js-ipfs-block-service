@@ -46,6 +46,8 @@ module.exports = class BlockService {
   putStream () {
     let ps
     if (this.isOnline()) {
+      // NOTE: This will have to change in order for bitswap
+      // to understand CID
       ps = this._bitswap.putStream()
     } else {
       ps = this._repo.blockstore.putStream()
@@ -76,7 +78,7 @@ module.exports = class BlockService {
 
   getStream (cid) {
     if (this.isOnline()) {
-      return this._bitswap.getStream(cid)
+      return this._bitswap.getStream(cid.multihash)
     }
 
     return this._repo.blockstore.getStream(cid.multihash)
