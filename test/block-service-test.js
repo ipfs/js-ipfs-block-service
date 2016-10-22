@@ -207,14 +207,17 @@ module.exports = (repo) => {
         const bitswap = {
           getStream (key) {
             return pull.values([
-              new Block(key)
+              new Block('secret')
             ])
           }
         }
 
         bs.goOnline(bitswap)
 
-        bs.get('secret', (err, block) => {
+        const block = new Block('secret')
+        const cid = new CID(block.key('sha2-256'))
+
+        bs.get(cid, (err, block) => {
           expect(err).to.not.exist
           expect(block.data).to.be.eql(new Block('secret').data)
           done()
