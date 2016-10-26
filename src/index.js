@@ -24,62 +24,73 @@ module.exports = class BlockService {
     return this._bitswap != null
   }
 
-  put (block, callback) {
+  // Note: we have to pass the CID, so that bitswap can then use it for
+  // the smart selectors. For now, passing the CID is used so that we know
+  // the right multihash, this means that now we have multiple hashes official
+  // support \o/
+  put (blockAndCID, callback) {
     callback = callback || (() => {})
-    if (!block) {
-      return callback(new Error('Missing block'))
+    if (!blockAndCID) {
+      return callback(new Error('Missing block and CID'))
     }
 
     pull(
-      pull.values([block]),
+      pull.values([
+        blockAndCID
+      ]),
       this.putStream(),
       pull.onEnd(callback)
     )
   }
 
   putStream () {
+    let ps
     if (this.isOnline()) {
-      return this._bitswap.putStream()
+      // NOTE: This will have to change in order for bitswap
+      // to understand CID
+      ps = this._bitswap.putStream()
+    } else {
+      ps = this._repo.blockstore.putStream()
     }
 
-    return this._repo.blockstore.putStream()
+    return pull(
+      pull.map((blockAndCID) => {
+        return {
+          data: blockAndCID.block.data,
+          key: blockAndCID.cid.multihash
+        }
+      }),
+      ps
+    )
   }
 
-  get (key, extension, callback) {
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
-    }
-
+  get (cid, callback) {
     pull(
-      this.getStream(key, extension),
+      this.getStream(cid),
       pull.collect((err, result) => {
-        if (err) return callback(err)
+        if (err) {
+          return callback(err)
+        }
         callback(null, result[0])
       })
     )
   }
 
-  getStream (key, extension) {
+  getStream (cid) {
     if (this.isOnline()) {
-      return this._bitswap.getStream(key)
+      return this._bitswap.getStream(cid.multihash)
     }
 
-    return this._repo.blockstore.getStream(key, extension)
+    return this._repo.blockstore.getStream(cid.multihash)
   }
 
-  delete (keys, extension, callback) {
-    if (typeof extension === 'function') {
-      callback = extension
-      extension = undefined
+  delete (cids, callback) {
+    if (!Array.isArray(cids)) {
+      cids = [cids]
     }
 
-    if (!Array.isArray(keys)) {
-      keys = [keys]
-    }
-
-    parallelLimit(keys.map((key) => (next) => {
-      this._repo.blockstore.delete(key, extension, next)
+    parallelLimit(cids.map((cid) => (next) => {
+      this._repo.blockstore.delete(cid.multihash, next)
     }), 100, callback)
   }
 }

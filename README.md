@@ -72,14 +72,17 @@ var repo = new IPFSRepo('example', { stores: Store })
 // create a block
 const block = new Block('hello world')
 console.log(block.data)
-console.log(block.key)
+console.log(block.key())
 
 // create a service
 const bs = new BlockService(repo)
 
 // add the block, then retrieve it
-bs.put(block, function (err) {
-  bs.get(block.key, function (err, b) {
+bs.put({
+  block: block,
+  cid: cid,
+}, function (err) {
+  bs.get(cid, function (err, b) {
     console.log(block.data.toString() === b.data.toString())
   })
 })
@@ -118,10 +121,70 @@ the global namespace.
 <script src="https://unpkg.com/ipfs-block-service/dist/index.js"></script>
 ```
 
-You can find the [API documentation here](API.md)
+# API
 
-[ipfs]: https://ipfs.io
-[bitswap]: https://github.com/ipfs/specs/tree/master/bitswap
+```js
+const BlockService = require('ipfs-block-service')
+```
+
+### `new BlockService(repo)`
+
+- `repo: Repo`
+
+Creates a new block service backed by [IPFS Repo][repo] `repo` for storage.
+
+### `goOnline(bitswap)`
+
+- `bitswap: Bitswap`
+
+Add a bitswap instance that communicates with the network to retreive blocks
+that are not in the local store.
+
+If the node is online all requests for blocks first check locally and
+afterwards ask the network for the blocks.
+
+### `goOffline()`
+
+Remove the bitswap instance and fall back to offline mode.
+
+### `isOnline()`
+
+Returns a `Boolean` indicating if the block service is online or not.
+
+### `put(blockAndCID, callback)`
+
+- `blockAndCID: { block: block, cid: cid }`
+- `callback: Function`
+
+Asynchronously adds a block instance to the underlying repo.
+
+### `putStream()`
+
+Returns a through pull-stream, which `blockAndCID`s can be written to, and
+that emits the meta data about the written block.
+
+### `get(cid [, extension], callback)`
+
+- `cid: CID`
+- `extension: String`, defaults to 'data'
+- `callback: Function`
+
+Asynchronously returns the block whose content multihash matches `multihash`.
+
+### `getStream(cid [, extension])`
+
+- `cid: CID`
+- `extension: String`, defaults to 'data'
+
+Returns a source pull-stream, which emits the requested block.
+
+### `delete(cids, [, extension], callback)`
+
+- `cids: CID | []CID`
+- `extension: String`, defaults to 'data' - `extension: String`, defaults to 'data'
+- `callback: Function`
+
+Deletes all blocks referenced by multihashes.
 
 ## Contribute
 
@@ -134,3 +197,9 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 ## License
 
 [MIT](LICENSE)
+
+[ipfs]: https://ipfs.io
+[bitswap]: https://github.com/ipfs/specs/tree/master/bitswap
+[repo]: https://github.com/ipfs/specs/tree/master/repo
+
+
