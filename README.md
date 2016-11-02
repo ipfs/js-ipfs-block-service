@@ -12,8 +12,7 @@
 ![](https://img.shields.io/badge/npm-%3E%3D3.0.0-orange.svg?style=flat-square)
 ![](https://img.shields.io/badge/Node.js-%3E%3D4.0.0-orange.svg?style=flat-square)
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/js-ipfs-block-service.svg)](https://saucelabs.com/
-u/js-ipfs-block-service)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/ipfs-block-service.svg)](https://saucelabs.com/u/ipfs-block-service)
 
 > [IPFS][ipfs] implementation of the BlockService and Block data structure in
 > JavaScript.
