@@ -1,6 +1,6 @@
 'use strict'
 
-const parallelLimit = require('run-parallel-limit')
+const parallelLimit = require('async/parallelLimit')
 const pull = require('pull-stream')
 
 // BlockService is a hybrid block datastore. It stores data in a local

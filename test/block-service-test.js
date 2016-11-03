@@ -5,7 +5,8 @@ const expect = require('chai').expect
 const Block = require('ipfs-block')
 const pull = require('pull-stream')
 const _ = require('lodash')
-const series = require('run-series')
+const map = require('async/map')
+const waterfall = require('async/waterfall')
 const CID = require('cids')
 
 const BlockService = require('../src')
@@ -21,27 +22,37 @@ module.exports = (repo) => {
     describe('offline', () => {
       it('store and get a block', (done) => {
         const b = new Block('A random data block')
-        const cid = new CID(b.key())
+        b.key((err, key) => {
+          expect(err).to.not.exist
+          const cid = new CID(key)
 
-        series([
-          (cb) => bs.put({ block: b, cid: cid }, cb),
-          (cb) => bs.get(cid, (err, block) => {
-            if (err) {
-              return cb(err)
+          waterfall([
+            (cb) => bs.put({ block: b, cid: cid }, cb),
+            (cb) => bs.get(cid, (err, block) => {
+              if (err) {
+                return cb(err)
+              }
+              block.key(cb)
+            }),
+            (blockKey, cb) => {
+              expect(key).to.be.eql(blockKey)
+              cb()
             }
-            expect(b.key()).to.be.eql(block.key())
-            cb()
-          })
-        ], done)
+          ], done)
+        })
       })
 
       it('get a non existent block', (done) => {
         const b = new Block('Not stored')
-        const cid = new CID(b.key())
 
-        bs.get(cid, (err, block) => {
-          expect(err).to.exist
-          done()
+        b.key((err, key) => {
+          expect(err).to.not.exist
+          const cid = new CID(key)
+
+          bs.get(cid, (err, block) => {
+            expect(err).to.exist
+            done()
+          })
         })
       })
 
@@ -51,11 +62,18 @@ module.exports = (repo) => {
         const b3 = new Block('3')
 
         pull(
-          pull.values([
-            { block: b1, cid: new CID(b1.key()) },
-            { block: b2, cid: new CID(b2.key()) },
-            { block: b3, cid: new CID(b3.key()) }
-          ]),
+          pull.values([b1, b2, b3]),
+          pull.asyncMap((b, cb) => {
+            b.key((err, key) => {
+              if (err) {
+                return cb(err)
+              }
+              cb(null, {
+                block: b,
+                cid: new CID(key)
+              })
+            })
+          }),
           bs.putStream(),
           pull.collect((err, meta) => {
             expect(err).to.not.exist
@@ -71,11 +89,18 @@ module.exports = (repo) => {
         const b3 = new Block('3')
 
         pull(
-          pull.values([
-            { block: b1, cid: new CID(b1.key()) },
-            { block: b2, cid: new CID(b2.key()) },
-            { block: b3, cid: new CID(b3.key()) }
-          ]),
+          pull.values([b1, b2, b3]),
+          pull.asyncMap((b, cb) => {
+            b.key((err, key) => {
+              if (err) {
+                return cb(err)
+              }
+              cb(null, {
+                block: b,
+                cid: new CID(key)
+              })
+            })
+          }),
           bs.putStream(),
           pull.onEnd((err) => {
             expect(err).to.not.exist
@@ -85,11 +110,8 @@ module.exports = (repo) => {
 
         function getAndAssert () {
           pull(
-            pull.values([
-              b1.key(),
-              b2.key(),
-              b3.key()
-            ]),
+            pull.values([b1, b2, b3]),
+            pull.asyncMap((b, cb) => b.key(cb)),
             pull.map((key) => {
               const cid = new CID(key)
               return bs.getStream(cid)
@@ -97,12 +119,13 @@ module.exports = (repo) => {
             pull.flatten(),
             pull.collect((err, blocks) => {
               expect(err).to.not.exist
-              const bPutKeys = blocks.map((b) => {
-                return b.key()
+              map(blocks.concat([b1, b2, b3]), (b, cb) => {
+                b.key(cb)
+              }, (err, res) => {
+                expect(err).to.not.exist
+                expect(res.slice(0, blocks.length)).to.be.eql(res.slice(blocks.length))
+                done()
               })
-
-              expect(bPutKeys).to.be.eql([b1.key(), b2.key(), b3.key()])
-              done()
             })
           )
         }
@@ -110,26 +133,29 @@ module.exports = (repo) => {
 
       it('delete a block', (done) => {
         const b = new Block('Will not live that much')
-        bs.put({ block: b, cid: new CID(b.key()) }, (err) => {
-          expect(err).to.not.exist
-          const cid = new CID(b.key())
-          bs.delete(cid, (err) => {
-            expect(err).to.not.exist
-            bs.get(cid, (err, block) => {
-              expect(err).to.exist
-              done()
-            })
+        let cid
+        waterfall([
+          (cb) => b.key(cb),
+          (key, cb) => {
+            cid = new CID(key)
+            cb()
+          },
+          (cb) => bs.put({ block: b, cid: cid }, cb),
+          (cb) => bs.delete(cid, cb),
+          (res, cb) => bs.get(cid, (err, res) => {
+            expect(err).to.exist
+            expect(res).to.not.exist
+            cb()
           })
-        })
+        ], done)
       })
 
       it('delete a non existent block', (done) => {
         const b = new Block('I do not exist')
-        const cid = new CID(b.key())
-        bs.delete(cid, (err) => {
-          expect(err).to.not.exist
-          done()
-        })
+        waterfall([
+          (cb) => b.key(cb),
+          (key, cb) => bs.delete(new CID(key), cb)
+        ], done)
       })
 
       it('delete many blocks', (done) => {
@@ -137,13 +163,11 @@ module.exports = (repo) => {
         const b2 = new Block('2')
         const b3 = new Block('3')
 
-        bs.delete([
-          new CID(b1.key()),
-          new CID(b2.key()),
-          new CID(b3.key())
-        ], (err) => {
+        map([b1, b2, b3], (b, cb) => {
+          b.key(cb)
+        }, (err, keys) => {
           expect(err).to.not.exist
-          done()
+          bs.delete(keys.map((k) => new CID(k)), done)
         })
       })
 
@@ -156,8 +180,16 @@ module.exports = (repo) => {
 
         pull(
           pull.values(blocks),
-          pull.map((block) => {
-            return { block: block, cid: new CID(block.key()) }
+          pull.asyncMap((block, cb) => {
+            block.key((err, key) => {
+              if (err) {
+                return cb(err)
+              }
+              cb(null, {
+                block: block,
+                cid: new CID(key)
+              })
+            })
           }),
           bs.putStream(),
           pull.onEnd((err) => {
@@ -165,9 +197,7 @@ module.exports = (repo) => {
 
             pull(
               pull.values(blocks),
-              pull.map((block) => {
-                return block.key()
-              }),
+              pull.asyncMap((block, cb) => block.key(cb)),
               pull.map((key) => {
                 const cid = new CID(key)
                 return bs.getStream(cid)
@@ -215,13 +245,15 @@ module.exports = (repo) => {
         bs.goOnline(bitswap)
 
         const block = new Block('secret')
-        const cid = new CID(block.key('sha2-256'))
 
-        bs.get(cid, (err, block) => {
-          expect(err).to.not.exist
-          expect(block.data).to.be.eql(new Block('secret').data)
-          done()
-        })
+        waterfall([
+          (cb) => block.key('sha2-256', cb),
+          (key, cb) => bs.get(new CID(key), cb),
+          (block, cb) => {
+            expect(block.data).to.be.eql(new Block('secret').data)
+            cb()
+          }
+        ], done)
       })
 
       it('puts the block through bitswap', (done) => {
@@ -234,15 +266,14 @@ module.exports = (repo) => {
 
         const block = new Block('secret sauce')
 
-        bs.put({
-          block: block,
-          cid: new CID(block.key('sha2-256'))
-        }, done)
+        waterfall([
+          (cb) => block.key('sha2-256', cb),
+          (key, cb) => bs.put({block: block, cid: new CID(key)}, cb)
+        ], done)
       })
 
       it('getStream through bitswap', (done) => {
         const b = new Block('secret sauce 1')
-        const cid = new CID(b.key('sha2-256'))
 
         const bitswap = {
           getStream () {
@@ -252,15 +283,23 @@ module.exports = (repo) => {
 
         bs.goOnline(bitswap)
 
-        pull(
-          bs.getStream(cid),
-          pull.collect((err, blocks) => {
-            expect(err).to.not.exist
-            expect(blocks[0].data).to.be.eql(b.data)
-            expect(blocks[0].key('sha2-256')).to.be.eql(cid.multihash)
-            done()
-          })
-        )
+        b.key((err, key) => {
+          expect(err).to.not.exist
+          const cid = new CID(key)
+
+          pull(
+            bs.getStream(cid),
+            pull.collect((err, blocks) => {
+              expect(err).to.not.exist
+              expect(blocks[0].data).to.be.eql(b.data)
+              blocks[0].key('sha2-256', (err, blockKey) => {
+                expect(err).to.not.exist
+                expect(blockKey).to.be.eql(cid.multihash)
+                done()
+              })
+            })
+          )
+        })
       })
     })
   })
