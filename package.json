@@ -42,7 +42,7 @@
     "fs-pull-blob-store": "^0.4.1",
     "idb-pull-blob-store": "^0.5.1",
     "ipfs-block": "^0.5.0",
-    "ipfs-repo": "^0.11.0",
+    "ipfs-repo": "^0.11.1",
     "lodash": "^4.16.6",
     "ncp": "^2.0.0",
     "pre-commit": "^1.1.3",
