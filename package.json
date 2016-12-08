@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "async": "^2.1.4",
-    "cids": "^0.2.0"
+    "cids": "^0.3.3"
   },
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
