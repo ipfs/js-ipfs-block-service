@@ -9,11 +9,12 @@
     "test": "aegir-test",
     "test:node": "aegir-test node",
     "test:browser": "aegir-test browser",
-    "release": "aegir-release",
-    "release-minor": "aegir-release --type minor",
-    "release-major": "aegir-release --type major",
+    "release": "aegir-release --docs",
+    "release-minor": "aegir-release --type minor --docs",
+    "release-major": "aegir-release --type major --docs",
     "coverage": "aegir-coverage",
-    "coverage-publish": "aegir-coverage publish"
+    "coverage-publish": "aegir-coverage publish",
+    "docs": "aegir-docs"
   },
   "pre-commit": [
     "lint",
@@ -36,25 +37,24 @@
   },
   "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
-    "aegir": "^10.0.0",
-    "buffer-loader": "0.0.1",
+    "aegir": "^11.0.0",
+    "async": "^2.1.5",
     "chai": "^3.5.0",
-    "fs-pull-blob-store": "~0.4.1",
-    "idb-pull-blob-store": "~0.5.1",
-    "ipfs-block": "~0.5.5",
-    "ipfs-repo": "~0.11.3",
+    "cids": "^0.4.2",
+    "dirty-chai": "^1.2.2",
+    "ipfs-block": "~0.6.0",
+    "ipfs-repo": "~0.12.0",
     "lodash": "^4.17.4",
+    "multihashing-async": "^0.4.4",
     "ncp": "^2.0.0",
     "pre-commit": "^1.2.2",
-    "rimraf": "^2.5.4"
+    "rimraf": "^2.6.1"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4.0.0",
+    "npm": ">=3.0.0"
   },
-  "dependencies": {
-    "async": "^2.1.4",
-    "cids": "~0.4.1"
-  },
+  "dependencies": {},
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
     "Friedel Ziegelmayer <dignifiedquire@gmail.com>",
