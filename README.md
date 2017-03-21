@@ -25,7 +25,6 @@ backed by an [IPFS Repo][repo] as its datastore for blocks, and uses [Bitswap][b
 ┌────────────────────┐
 │     BlockService   │
 └────────────────────┘
-           │
      ┌─────┴─────┐
      ▼           ▼
 ┌─────────┐ ┌───────┐
@@ -42,6 +41,7 @@ backed by an [IPFS Repo][repo] as its datastore for blocks, and uses [Bitswap][b
   - [Example](#example)
   - [Browser: Browserify, Webpack, other bundlers](#browser-browserify-webpack-other-bundlers)
   - [Browser: `<script>` Tag](#browser-script-tag)
+- [API](#api)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -50,7 +50,7 @@ backed by an [IPFS Repo][repo] as its datastore for blocks, and uses [Bitswap][b
 ### npm
 
 ```sh
-> npm i ipfs-block-service
+> npm install ipfs-block-service
 ```
 
 ## Usage
@@ -68,47 +68,40 @@ const BlockService = require('ipfs-block-service')
 const BlockService = require('ipfs-block-service')
 const Block = require('ipfs-block')
 const IPFSRepo = require('ipfs-repo')  // storage repo
-const Store = require('interface-pull-blob-store')  // in-memory store
 
 // setup a repo
-var repo = new IPFSRepo('example', { stores: Store })
+const repo = new IPFSRepo('example')
 
 // create a block
-const block = new Block('hello world')
-console.log(block.data)
-console.log(block.key())
+const data = new Buffer('hello world')
+multihashing(data, 'sha2-256', (err, multihash) => {
+  if (err) {
+    throw err
+  }
 
-// create a service
-const bs = new BlockService(repo)
+  const cid = new CID(multihash)
+  const block = new Block(data, cid)
 
-// add the block, then retrieve it
-bs.put({
-  block: block,
-  cid: cid,
-}, function (err) {
-  bs.get(cid, function (err, b) {
-    console.log(block.data.toString() === b.data.toString())
+  // create a service
+  const bs = new BlockService(repo)
+
+  // add the block, then retrieve it
+  bs.put(block, (err) => {
+    if (err) {
+      throw err
+    }
+    bs.get(cid, (err, b) => {
+      if (err) {
+        throw err
+      }
+      console.log(block.data.toString() === b.data.toString())
+      // => true
+    })
   })
 })
 ```
 
-outputs
-
-```
-<Buffer 68 65 6c 6c 6f 20 77 61 72 6c 64>
-
-<Buffer 12 20 db 3c 15 23 3f f3 84 8f 42 fe 3b 74 78 90 90 5a 80 7e a6 ef 2b 6d 2f 3c 8b 2c b7 ae be 86 3c 4d>
-
-true
-
-```
-
 ### Browser: Browserify, Webpack, other bundlers
-
-The code published to npm that gets loaded on require is in fact a ES5
-transpiled version with the right shims added. This means that you can require
-it and use with your favourite bundler without having to adjust asset management
-process.
 
 ```JavaScript
 var BlockService = require('ipfs-block-service')
@@ -125,70 +118,9 @@ the global namespace.
 <script src="https://unpkg.com/ipfs-block-service/dist/index.js"></script>
 ```
 
-# API
+## API
 
-```js
-const BlockService = require('ipfs-block-service')
-```
-
-### `new BlockService(repo)`
-
-- `repo: Repo`
-
-Creates a new block service backed by [IPFS Repo][repo] `repo` for storage.
-
-### `goOnline(bitswap)`
-
-- `bitswap: Bitswap`
-
-Add a bitswap instance that communicates with the network to retreive blocks
-that are not in the local store.
-
-If the node is online all requests for blocks first check locally and
-afterwards ask the network for the blocks.
-
-### `goOffline()`
-
-Remove the bitswap instance and fall back to offline mode.
-
-### `isOnline()`
-
-Returns a `Boolean` indicating if the block service is online or not.
-
-### `put(blockAndCID, callback)`
-
-- `blockAndCID: { block: block, cid: cid }`
-- `callback: Function`
-
-Asynchronously adds a block instance to the underlying repo.
-
-### `putStream()`
-
-Returns a through pull-stream, which `blockAndCID`s can be written to, and
-that emits the meta data about the written block.
-
-### `get(cid [, extension], callback)`
-
-- `cid: CID`
-- `extension: String`, defaults to 'data'
-- `callback: Function`
-
-Asynchronously returns the block whose content multihash matches `multihash`.
-
-### `getStream(cid [, extension])`
-
-- `cid: CID`
-- `extension: String`, defaults to 'data'
-
-Returns a source pull-stream, which emits the requested block.
-
-### `delete(cids, [, extension], callback)`
-
-- `cids: CID | []CID`
-- `extension: String`, defaults to 'data' - `extension: String`, defaults to 'data'
-- `callback: Function`
-
-Deletes all blocks referenced by multihashes.
+See https://ipfs.github.io/js-ipfs-block-service
 
 ## Contribute
 
@@ -205,5 +137,3 @@ This repository falls under the IPFS [Code of Conduct](https://github.com/ipfs/c
 [ipfs]: https://ipfs.io
 [bitswap]: https://github.com/ipfs/specs/tree/master/bitswap
 [repo]: https://github.com/ipfs/specs/tree/master/repo
-
-

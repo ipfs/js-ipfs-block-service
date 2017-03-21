@@ -1,13 +1,16 @@
 /* eslint-env mocha */
 'use strict'
 
-const expect = require('chai').expect
+const chai = require('chai')
+chai.use(require('dirty-chai'))
+const expect = chai.expect
+
 const Block = require('ipfs-block')
-const pull = require('pull-stream')
 const _ = require('lodash')
 const map = require('async/map')
 const waterfall = require('async/waterfall')
 const CID = require('cids')
+const multihashing = require('multihashing-async')
 
 const BlockService = require('../src')
 
@@ -21,21 +24,16 @@ module.exports = (repo) => {
 
     describe('offline', () => {
       it('store and get a block', (done) => {
-        const b = new Block('A random data block')
-        b.key((err, key) => {
-          expect(err).to.not.exist
-          const cid = new CID(key)
+        const data = new Buffer('A random data block')
+        multihashing(data, 'sha2-256', (err, hash) => {
+          expect(err).to.not.exist()
+          const b = new Block(data, new CID(hash))
 
           waterfall([
-            (cb) => bs.put({ block: b, cid: cid }, cb),
-            (cb) => bs.get(cid, (err, block) => {
-              if (err) {
-                return cb(err)
-              }
-              block.key(cb)
-            }),
-            (blockKey, cb) => {
-              expect(key).to.be.eql(blockKey)
+            (cb) => bs.put(b, cb),
+            (cb) => bs.get(b.cid, cb),
+            (res, cb) => {
+              expect(res).to.be.eql(b)
               cb()
             }
           ], done)
@@ -43,174 +41,92 @@ module.exports = (repo) => {
       })
 
       it('get a non existent block', (done) => {
-        const b = new Block('Not stored')
+        const data = new Buffer('Not stored')
 
-        b.key((err, key) => {
-          expect(err).to.not.exist
-          const cid = new CID(key)
-
-          bs.get(cid, (err, block) => {
-            expect(err).to.exist
+        multihashing(data, 'sha2-256', (err, hash) => {
+          expect(err).to.not.exist()
+          bs.get(new CID(hash), (err, block) => {
+            expect(err).to.exist()
+            expect(block).to.not.exist()
             done()
           })
         })
       })
 
       it('store many blocks', (done) => {
-        const b1 = new Block('1')
-        const b2 = new Block('2')
-        const b3 = new Block('3')
-
-        pull(
-          pull.values([b1, b2, b3]),
-          pull.asyncMap((b, cb) => {
-            b.key((err, key) => {
-              if (err) {
-                return cb(err)
-              }
-              cb(null, {
-                block: b,
-                cid: new CID(key)
-              })
-            })
-          }),
-          bs.putStream(),
-          pull.collect((err, meta) => {
-            expect(err).to.not.exist
-            expect(meta).to.have.length(3)
-            done()
+        const data = [new Buffer('1'), new Buffer('2'), new Buffer('3')]
+        map(data, (d, cb) => {
+          multihashing(d, 'sha2-256', (err, hash) => {
+            expect(err).to.not.exist()
+            cb(null, new Block(d, new CID(hash)))
           })
-        )
+        }, (err, blocks) => {
+          expect(err).to.not.exist()
+          bs.putMany(blocks, done)
+        })
       })
 
       it('get many blocks', (done) => {
-        const b1 = new Block('1')
-        const b2 = new Block('2')
-        const b3 = new Block('3')
-
-        pull(
-          pull.values([b1, b2, b3]),
-          pull.asyncMap((b, cb) => {
-            b.key((err, key) => {
-              if (err) {
-                return cb(err)
-              }
-              cb(null, {
-                block: b,
-                cid: new CID(key)
-              })
+        const data = [new Buffer('1'), new Buffer('2'), new Buffer('3')]
+        waterfall([
+          (cb) => map(data, (d, cb) => {
+            multihashing(d, 'sha2-256', (err, hash) => {
+              expect(err).to.not.exist()
+              cb(null, new Block(d, new CID(hash)))
             })
-          }),
-          bs.putStream(),
-          pull.onEnd((err) => {
-            expect(err).to.not.exist
-            getAndAssert()
-          })
-        )
-
-        function getAndAssert () {
-          pull(
-            pull.values([b1, b2, b3]),
-            pull.asyncMap((b, cb) => b.key(cb)),
-            pull.map((key) => {
-              const cid = new CID(key)
-              return bs.getStream(cid)
-            }),
-            pull.flatten(),
-            pull.collect((err, blocks) => {
-              expect(err).to.not.exist
-              map(blocks.concat([b1, b2, b3]), (b, cb) => {
-                b.key(cb)
-              }, (err, res) => {
-                expect(err).to.not.exist
-                expect(res.slice(0, blocks.length)).to.be.eql(res.slice(blocks.length))
-                done()
-              })
-            })
+          }, cb),
+          (blocks, cb) => map(
+            blocks,
+            (b, cb) => bs.get(b.cid, cb),
+            (err, res) => {
+              expect(err).to.not.exist()
+              expect(res).to.be.eql(blocks)
+              cb()
+            }
           )
-        }
+        ], done)
       })
 
       it('delete a block', (done) => {
-        const b = new Block('Will not live that much')
-        let cid
-        waterfall([
-          (cb) => b.key(cb),
-          (key, cb) => {
-            cid = new CID(key)
-            cb()
-          },
-          (cb) => bs.put({ block: b, cid: cid }, cb),
-          (cb) => bs.delete(cid, cb),
-          (res, cb) => bs.get(cid, (err, res) => {
-            expect(err).to.exist
-            expect(res).to.not.exist
-            cb()
+        const data = new Buffer('Will not live that much')
+        multihashing(data, 'sha2-256', (err, hash) => {
+          expect(err).to.not.exist()
+          const b = new Block(data, new CID(hash))
+
+          waterfall([
+            (cb) => bs.put(b, cb),
+            (cb) => bs.delete(b.cid, cb),
+            (cb) => bs._repo.blockstore.has(b.cid, cb),
+            (res, cb) => {
+              expect(res).to.be.eql(false)
+              cb()
+            }
+          ], done)
+        })
+      })
+
+      it('stores and gets lots of blocks', (done) => {
+        const data = _.range(1000).map((i) => {
+          return new Buffer(`hello-${i}-${Math.random()}`)
+        })
+
+        map(data, (d, cb) => {
+          multihashing(d, 'sha2-256', (err, hash) => {
+            expect(err).to.not.exist()
+            cb(null, new Block(d, new CID(hash)))
           })
-        ], done)
-      })
+        }, (err, blocks) => {
+          expect(err).to.not.exist()
+          bs.putMany(blocks, (err) => {
+            expect(err).to.not.exist()
 
-      it('delete a non existent block', (done) => {
-        const b = new Block('I do not exist')
-        waterfall([
-          (cb) => b.key(cb),
-          (key, cb) => bs.delete(new CID(key), cb)
-        ], done)
-      })
-
-      it('delete many blocks', (done) => {
-        const b1 = new Block('1')
-        const b2 = new Block('2')
-        const b3 = new Block('3')
-
-        map([b1, b2, b3], (b, cb) => {
-          b.key(cb)
-        }, (err, keys) => {
-          expect(err).to.not.exist
-          bs.delete(keys.map((k) => new CID(k)), done)
-        })
-      })
-
-      it('stores and gets lots of blocks', function (done) {
-        this.timeout(60 * 1000)
-
-        const blocks = _.range(1000).map((i) => {
-          return new Block(`hello-${i}-${Math.random()}`)
-        })
-
-        pull(
-          pull.values(blocks),
-          pull.asyncMap((block, cb) => {
-            block.key((err, key) => {
-              if (err) {
-                return cb(err)
-              }
-              cb(null, {
-                block: block,
-                cid: new CID(key)
-              })
+            map(blocks, (b, cb) => bs.get(b.cid, cb), (err, res) => {
+              expect(err).to.not.exist()
+              expect(res).to.be.eql(blocks)
+              done()
             })
-          }),
-          bs.putStream(),
-          pull.onEnd((err) => {
-            expect(err).to.not.exist
-
-            pull(
-              pull.values(blocks),
-              pull.asyncMap((block, cb) => block.key(cb)),
-              pull.map((key) => {
-                const cid = new CID(key)
-                return bs.getStream(cid)
-              }),
-              pull.flatten(),
-              pull.collect((err, retrievedBlocks) => {
-                expect(err).to.not.exist
-                expect(retrievedBlocks.length).to.be.eql(blocks.length)
-                done()
-              })
-            )
           })
-        )
+        })
       })
 
       it('goes offline', () => {
@@ -235,70 +151,44 @@ module.exports = (repo) => {
       it('retrieves a block through bitswap', (done) => {
         // returns a block with a value equal to its key
         const bitswap = {
-          getStream (key) {
-            return pull.values([
-              new Block('secret')
-            ])
+          get (cid, callback) {
+            callback(null, new Block(new Buffer('secret'), cid))
           }
         }
 
         bs.goOnline(bitswap)
 
-        const block = new Block('secret')
+        const data = new Buffer('secret')
 
         waterfall([
-          (cb) => block.key('sha2-256', cb),
-          (key, cb) => bs.get(new CID(key), cb),
+          (cb) => multihashing(data, 'sha2-256', cb),
+          (hash, cb) => bs.get(new CID(hash), cb),
           (block, cb) => {
-            expect(block.data).to.be.eql(new Block('secret').data)
+            expect(block.data).to.be.eql(data)
             cb()
           }
         ], done)
       })
 
       it('puts the block through bitswap', (done) => {
+        const puts = []
         const bitswap = {
-          putStream () {
-            return pull.through(() => {})
+          put (block, callback) {
+            puts.push(block)
+            callback()
           }
         }
         bs.goOnline(bitswap)
 
-        const block = new Block('secret sauce')
+        const data = new Buffer('secret sauce')
 
         waterfall([
-          (cb) => block.key('sha2-256', cb),
-          (key, cb) => bs.put({block: block, cid: new CID(key)}, cb)
-        ], done)
-      })
-
-      it('getStream through bitswap', (done) => {
-        const b = new Block('secret sauce 1')
-
-        const bitswap = {
-          getStream () {
-            return pull.values([b])
-          }
-        }
-
-        bs.goOnline(bitswap)
-
-        b.key((err, key) => {
-          expect(err).to.not.exist
-          const cid = new CID(key)
-
-          pull(
-            bs.getStream(cid),
-            pull.collect((err, blocks) => {
-              expect(err).to.not.exist
-              expect(blocks[0].data).to.be.eql(b.data)
-              blocks[0].key('sha2-256', (err, blockKey) => {
-                expect(err).to.not.exist
-                expect(blockKey).to.be.eql(cid.multihash)
-                done()
-              })
-            })
-          )
+          (cb) => multihashing(data, 'sha2-256', cb),
+          (hash, cb) => bs.put(new Block(data, new CID(hash)), cb)
+        ], (err) => {
+          expect(err).to.not.exist()
+          expect(puts).to.have.length(1)
+          done()
         })
       })
     })
