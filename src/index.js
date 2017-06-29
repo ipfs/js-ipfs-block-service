@@ -61,7 +61,7 @@ class BlockService {
       return this._bitswap.put(block, callback)
     }
 
-    this._repo.blockstore.put(block, callback)
+    this._repo.blocks.put(block, callback)
   }
 
   /**
@@ -76,7 +76,7 @@ class BlockService {
       return this._bitswap.putMany(blocks, callback)
     }
 
-    this._repo.blockstore.putMany(blocks, callback)
+    this._repo.blocks.putMany(blocks, callback)
   }
 
   /**
@@ -91,7 +91,7 @@ class BlockService {
       return this._bitswap.get(cid, callback)
     }
 
-    return this._repo.blockstore.get(cid, callback)
+    return this._repo.blocks.get(cid, callback)
   }
 
   /**
@@ -102,7 +102,7 @@ class BlockService {
    * @return {void}
    */
   delete (cid, callback) {
-    this._repo.blockstore.delete(cid, callback)
+    this._repo.blocks.delete(cid, callback)
   }
 }
 
