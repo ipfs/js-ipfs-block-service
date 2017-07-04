@@ -27,7 +27,7 @@ class BlockService {
    * @param {Bitswap} bitswap
    * @returns {void}
    */
-  goOnline (bitswap) {
+  setExchange (bitswap) {
     this._bitswap = bitswap
   }
 
@@ -36,7 +36,7 @@ class BlockService {
    *
    * @returns {void}
    */
-  goOffline () {
+  unsetExchange () {
     this._bitswap = null
   }
 
@@ -45,7 +45,7 @@ class BlockService {
    *
    * @returns {bool}
    */
-  isOnline () {
+  hasExchange () {
     return this._bitswap != null
   }
 
@@ -57,7 +57,7 @@ class BlockService {
    * @returns {void}
    */
   put (block, callback) {
-    if (this.isOnline()) {
+    if (this.hasExchange()) {
       return this._bitswap.put(block, callback)
     }
 
@@ -72,7 +72,7 @@ class BlockService {
    * @returns {void}
    */
   putMany (blocks, callback) {
-    if (this.isOnline()) {
+    if (this.hasExchange()) {
       return this._bitswap.putMany(blocks, callback)
     }
 
@@ -87,7 +87,7 @@ class BlockService {
    * @returns {void}
    */
   get (cid, callback) {
-    if (this.isOnline()) {
+    if (this.hasExchange()) {
       return this._bitswap.get(cid, callback)
     }
 

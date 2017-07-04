@@ -129,23 +129,23 @@ module.exports = (repo) => {
         })
       })
 
-      it('goes offline', () => {
+      it('sets and unsets exchange', () => {
         bs = new BlockService(repo)
-        bs.goOnline({})
-        expect(bs.isOnline()).to.be.eql(true)
-        bs.goOffline()
-        expect(bs.isOnline()).to.be.eql(false)
+        bs.setExchange({})
+        expect(bs.hasExchange()).to.be.eql(true)
+        bs.unsetExchange()
+        expect(bs.hasExchange()).to.be.eql(false)
       })
     })
 
-    describe('online', () => {
+    describe('has exchange', () => {
       beforeEach(() => {
         bs = new BlockService(repo)
       })
 
-      it('isOnline returns true when online', () => {
-        bs.goOnline({})
-        expect(bs.isOnline()).to.be.eql(true)
+      it('hasExchange returns true when online', () => {
+        bs.setExchange({})
+        expect(bs.hasExchange()).to.be.eql(true)
       })
 
       it('retrieves a block through bitswap', (done) => {
@@ -156,7 +156,7 @@ module.exports = (repo) => {
           }
         }
 
-        bs.goOnline(bitswap)
+        bs.setExchange(bitswap)
 
         const data = new Buffer('secret')
 
@@ -178,7 +178,7 @@ module.exports = (repo) => {
             callback()
           }
         }
-        bs.goOnline(bitswap)
+        bs.setExchange(bitswap)
 
         const data = new Buffer('secret sauce')
 
