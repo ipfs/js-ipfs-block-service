@@ -96,7 +96,7 @@ module.exports = (repo) => {
           waterfall([
             (cb) => bs.put(b, cb),
             (cb) => bs.delete(b.cid, cb),
-            (cb) => bs._repo.blockstore.has(b.cid, cb),
+            (cb) => bs._repo.blocks.has(b.cid, cb),
             (res, cb) => {
               expect(res).to.be.eql(false)
               cb()
