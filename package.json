@@ -39,13 +39,13 @@
   "devDependencies": {
     "aegir": "^11.0.2",
     "async": "^2.5.0",
-    "chai": "^4.0.2",
-    "cids": "^0.5.0",
-    "dirty-chai": "^2.0.0",
+    "chai": "^4.1.0",
+    "cids": "^0.5.1",
+    "dirty-chai": "^2.0.1",
     "ipfs-block": "~0.6.0",
-    "ipfs-repo": "~0.15.0",
+    "ipfs-repo": "~0.17.0",
     "lodash": "^4.17.4",
-    "multihashing-async": "^0.4.5",
+    "multihashing-async": "^0.4.6",
     "ncp": "^2.0.0",
     "pre-commit": "^1.2.2",
     "rimraf": "^2.6.1"
