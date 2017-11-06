@@ -24,7 +24,7 @@ module.exports = (repo) => {
 
     describe('offline', () => {
       it('store and get a block', (done) => {
-        const data = new Buffer('A random data block')
+        const data = Buffer.from('A random data block')
         multihashing(data, 'sha2-256', (err, hash) => {
           expect(err).to.not.exist()
           const b = new Block(data, new CID(hash))
@@ -41,7 +41,7 @@ module.exports = (repo) => {
       })
 
       it('get a non existent block', (done) => {
-        const data = new Buffer('Not stored')
+        const data = Buffer.from('Not stored')
 
         multihashing(data, 'sha2-256', (err, hash) => {
           expect(err).to.not.exist()
@@ -54,7 +54,7 @@ module.exports = (repo) => {
       })
 
       it('store many blocks', (done) => {
-        const data = [new Buffer('1'), new Buffer('2'), new Buffer('3')]
+        const data = [Buffer.from('1'), Buffer.from('2'), Buffer.from('3')]
         map(data, (d, cb) => {
           multihashing(d, 'sha2-256', (err, hash) => {
             expect(err).to.not.exist()
@@ -67,7 +67,7 @@ module.exports = (repo) => {
       })
 
       it('get many blocks', (done) => {
-        const data = [new Buffer('1'), new Buffer('2'), new Buffer('3')]
+        const data = [Buffer.from('1'), Buffer.from('2'), Buffer.from('3')]
         waterfall([
           (cb) => map(data, (d, cb) => {
             multihashing(d, 'sha2-256', (err, hash) => {
@@ -88,7 +88,7 @@ module.exports = (repo) => {
       })
 
       it('delete a block', (done) => {
-        const data = new Buffer('Will not live that much')
+        const data = Buffer.from('Will not live that much')
         multihashing(data, 'sha2-256', (err, hash) => {
           expect(err).to.not.exist()
           const b = new Block(data, new CID(hash))
@@ -107,7 +107,7 @@ module.exports = (repo) => {
 
       it('stores and gets lots of blocks', (done) => {
         const data = _.range(1000).map((i) => {
-          return new Buffer(`hello-${i}-${Math.random()}`)
+          return Buffer.from(`hello-${i}-${Math.random()}`)
         })
 
         map(data, (d, cb) => {
@@ -152,13 +152,13 @@ module.exports = (repo) => {
         // returns a block with a value equal to its key
         const bitswap = {
           get (cid, callback) {
-            callback(null, new Block(new Buffer('secret'), cid))
+            callback(null, new Block(Buffer.from('secret'), cid))
           }
         }
 
         bs.setExchange(bitswap)
 
-        const data = new Buffer('secret')
+        const data = Buffer.from('secret')
 
         waterfall([
           (cb) => multihashing(data, 'sha2-256', cb),
@@ -180,7 +180,7 @@ module.exports = (repo) => {
         }
         bs.setExchange(bitswap)
 
-        const data = new Buffer('secret sauce')
+        const data = Buffer.from('secret sauce')
 
         waterfall([
           (cb) => multihashing(data, 'sha2-256', cb),
