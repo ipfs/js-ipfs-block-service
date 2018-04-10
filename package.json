@@ -43,7 +43,7 @@
     "cids": "^0.5.3",
     "dirty-chai": "^2.0.1",
     "ipfs-block": "~0.7.1",
-    "ipfs-repo": "~0.18.7",
+    "ipfs-repo": "~0.19.0",
     "lodash": "^4.17.5",
     "multihashing-async": "~0.4.8",
     "ncp": "^2.0.0",
