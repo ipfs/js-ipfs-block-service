@@ -2,6 +2,7 @@
   "name": "ipfs-block-service",
   "version": "0.14.0",
   "description": "JavaScript Implementation of BlockService",
+  "leadMaintainer": "Volker Mische <volker.mische@gmail.com>",
   "main": "src/index.js",
   "scripts": {
     "lint": "aegir lint",
@@ -26,10 +27,6 @@
   },
   "keywords": [
     "IPFS"
-  ],
-  "authors": [
-    "David Dias <daviddias@ipfs.io>",
-    "Vijayee Kulkaa <vijayee.kulkaa@hushmail.com"
   ],
   "license": "MIT",
   "bugs": {

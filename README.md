@@ -27,6 +27,10 @@
 └─────────┘ └───────┘
 ```
 
+## Lead Maintainer
+
+[Volker Mische](https://github.com/vmx)
+
 ## Table of Contents
 
 - [Install](#install)
