@@ -105,7 +105,9 @@ module.exports = (repo) => {
         })
       })
 
-      it('stores and gets lots of blocks', (done) => {
+      it('stores and gets lots of blocks', function (done) {
+        this.timeout(8 * 1000)
+
         const data = _.range(1000).map((i) => {
           return Buffer.from(`hello-${i}-${Math.random()}`)
         })
