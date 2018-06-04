@@ -55,6 +55,7 @@ module.exports = (repo) => {
 
       it('store many blocks', (done) => {
         const data = [Buffer.from('1'), Buffer.from('2'), Buffer.from('3')]
+
         map(data, (d, cb) => {
           multihashing(d, 'sha2-256', (err, hash) => {
             expect(err).to.not.exist()
@@ -66,8 +67,9 @@ module.exports = (repo) => {
         })
       })
 
-      it('get many blocks', (done) => {
+      it('get many blocks through get', (done) => {
         const data = [Buffer.from('1'), Buffer.from('2'), Buffer.from('3')]
+
         waterfall([
           (cb) => map(data, (d, cb) => {
             multihashing(d, 'sha2-256', (err, hash) => {
@@ -84,6 +86,27 @@ module.exports = (repo) => {
               cb()
             }
           )
+        ], done)
+      })
+
+      it('get many blocks through getMany', (done) => {
+        const data = [Buffer.from('1'), Buffer.from('2'), Buffer.from('3')]
+
+        waterfall([
+          (cb) => map(data, (d, cb) => {
+            multihashing(d, 'sha2-256', (err, hash) => {
+              expect(err).to.not.exist()
+              cb(null, new Block(d, new CID(hash)))
+            })
+          }, cb),
+          (blocks, cb) => map(blocks, (b, cb) => cb(null, b.cid), (err, cids) => {
+            expect(err).to.not.exist()
+            bs.getMany(cids, (err, _blocks) => {
+              expect(err).to.not.exist()
+              expect(blocks).to.eql(blocks)
+              cb()
+            })
+          })
         ], done)
       })
 
