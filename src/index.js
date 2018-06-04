@@ -98,7 +98,7 @@ class BlockService {
   /**
    * Get multiple blocks a block by cid.
    *
-   * @param {CID} cid
+   * @param {Array<CID>} cids
    * @param {function(Error, Block)} callback
    * @returns {void}
    */
