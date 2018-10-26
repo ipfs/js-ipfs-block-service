@@ -10,7 +10,6 @@ class BlockService {
    * Create a new BlockService
    *
    * @param {IPFSRepo} ipfsRepo
-   * @returns {BlockService}
    */
   constructor (ipfsRepo) {
     this._repo = ipfsRepo
