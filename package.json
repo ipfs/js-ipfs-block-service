@@ -1,6 +1,6 @@
 {
   "name": "ipfs-block-service",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "JavaScript Implementation of BlockService",
   "leadMaintainer": "Volker Mische <volker.mische@gmail.com>",
   "main": "src/index.js",
@@ -60,6 +60,8 @@
     "Richard Littauer <richard.littauer@gmail.com>",
     "Richard Schneider <makaretu@gmail.com>",
     "Stephen Whitmore <stephen.whitmore@gmail.com>",
+    "Volker Mische <volker.mische@gmail.com>",
+    "achingbrain <alex@achingbrain.net>",
     "greenkeeper[bot] <greenkeeper[bot]@users.noreply.github.com>",
     "npmcdn-to-unpkg-bot <npmcdn-to-unpkg-bot@users.noreply.github.com>",
     "wanderer <mjbecze@gmail.com>",
