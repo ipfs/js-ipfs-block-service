@@ -17,10 +17,6 @@
     "coverage-publish": "aegir coverage --provider coveralls",
     "docs": "aegir docs"
   },
-  "pre-commit": [
-    "lint",
-    "test"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ipfs/js-ipfs-block-service.git"
@@ -44,7 +40,6 @@
     "lodash": "^4.17.11",
     "multihashing-async": "~0.5.1",
     "ncp": "^2.0.0",
-    "pre-commit": "^1.2.2",
     "rimraf": "^2.6.2"
   },
   "engines": {
