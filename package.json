@@ -1,6 +1,6 @@
 {
   "name": "ipfs-block-service",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "JavaScript Implementation of BlockService",
   "leadMaintainer": "Volker Mische <volker.mische@gmail.com>",
   "main": "src/index.js",
