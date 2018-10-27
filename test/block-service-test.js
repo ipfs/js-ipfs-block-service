@@ -82,7 +82,7 @@ module.exports = (repo) => {
           expect(err).to.not.exist()
           bs.getMany(cids, (err, _blocks) => {
             expect(err).to.not.exist()
-            expect(testBlocks).to.eql(testBlocks)
+            expect(testBlocks).to.eql(_blocks)
             done()
           })
         })

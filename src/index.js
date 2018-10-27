@@ -59,10 +59,10 @@ class BlockService {
    */
   put (block, callback) {
     if (this.hasExchange()) {
-      return this._bitswap.put(block, callback)
+      this._bitswap.put(block, callback)
+    } else {
+      this._repo.blocks.put(block, callback)
     }
-
-    this._repo.blocks.put(block, callback)
   }
 
   /**
@@ -74,10 +74,10 @@ class BlockService {
    */
   putMany (blocks, callback) {
     if (this.hasExchange()) {
-      return this._bitswap.putMany(blocks, callback)
+      this._bitswap.putMany(blocks, callback)
+    } else {
+      this._repo.blocks.putMany(blocks, callback)
     }
-
-    this._repo.blocks.putMany(blocks, callback)
   }
 
   /**
@@ -89,14 +89,14 @@ class BlockService {
    */
   get (cid, callback) {
     if (this.hasExchange()) {
-      return this._bitswap.get(cid, callback)
+      this._bitswap.get(cid, callback)
+    } else {
+      this._repo.blocks.get(cid, callback)
     }
-
-    return this._repo.blocks.get(cid, callback)
   }
 
   /**
-   * Get multiple blocks a block by cid.
+   * Get multiple blocks back from an array of cids.
    *
    * @param {Array<CID>} cids
    * @param {function(Error, Block)} callback
@@ -104,13 +104,12 @@ class BlockService {
    */
   getMany (cids, callback) {
     if (!Array.isArray(cids)) {
-      return callback(new Error('first arg must be an array of cids'))
+      callback(new Error('first arg must be an array of cids'))
+    } else if (this.hasExchange()) {
+      this._bitswap.getMany(cids, callback)
+    } else {
+      asyncMap(cids, (cid, cb) => this._repo.blocks.get(cid, cb), callback)
     }
-    if (this.hasExchange()) {
-      return this._bitswap.getMany(cids, callback)
-    }
-
-    asyncMap(cids, (cid, cb) => this._repo.blocks.get(cid, cb), callback)
   }
 
   /**
