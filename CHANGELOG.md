@@ -1,3 +1,13 @@
+<a name="0.15.1"></a>
+## [0.15.1](https://github.com/ipfs/js-ipfs-block-service/compare/v0.15.0...v0.15.1) (2018-10-27)
+
+
+### Features
+
+* .getMany ([#81](https://github.com/ipfs/js-ipfs-block-service/issues/81)) ([8aa9e0a](https://github.com/ipfs/js-ipfs-block-service/commit/8aa9e0a))
+
+
+
 <a name="0.15.0"></a>
 # [0.15.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.14.0...v0.15.0) (2018-10-26)
 
