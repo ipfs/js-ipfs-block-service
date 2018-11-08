@@ -1,3 +1,8 @@
+<a name="0.15.2"></a>
+## [0.15.2](https://github.com/ipfs/js-ipfs-block-service/compare/v0.15.1...v0.15.2) (2018-11-08)
+
+
+
 <a name="0.15.1"></a>
 ## [0.15.1](https://github.com/ipfs/js-ipfs-block-service/compare/v0.15.0...v0.15.1) (2018-10-27)
 
