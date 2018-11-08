@@ -31,7 +31,6 @@
   "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
     "aegir": "^17.0.0",
-    "async": "^2.6.1",
     "chai": "^4.2.0",
     "cids": "~0.5.5",
     "dirty-chai": "^2.0.1",
@@ -46,7 +45,9 @@
     "node": ">=6.0.0",
     "npm": ">=3.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "async": "^2.6.1"
+  },
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
     "Friedel Ziegelmayer <dignifiedquire@gmail.com>",
