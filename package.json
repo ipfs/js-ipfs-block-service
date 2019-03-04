@@ -30,23 +30,23 @@
   },
   "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
-    "aegir": "^17.0.0",
+    "aegir": "^18.2.0",
     "chai": "^4.2.0",
-    "cids": "~0.5.5",
+    "cids": "~0.5.7",
     "dirty-chai": "^2.0.1",
     "ipfs-block": "~0.8.0",
-    "ipfs-repo": "~0.25.0",
+    "ipfs-repo": "~0.26.2",
     "lodash": "^4.17.11",
-    "multihashing-async": "~0.5.1",
+    "multihashing-async": "~0.5.2",
     "ncp": "^2.0.0",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.3"
   },
   "engines": {
     "node": ">=6.0.0",
     "npm": ">=3.0.0"
   },
   "dependencies": {
-    "async": "^2.6.1"
+    "async": "^2.6.2"
   },
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
