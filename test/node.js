@@ -1,9 +1,7 @@
 /* eslint-env mocha */
 'use strict'
 
-const ncp = require('ncp').ncp
-const series = require('async/series')
-const rimraf = require('rimraf')
+const fs = require('fs-extra')
 const path = require('path')
 const IPFSRepo = require('ipfs-repo')
 
@@ -15,18 +13,14 @@ describe('IPFS Block Tests on Node.js', () => {
   const repoPath = testRepoPath + '-for-' + date
   const repo = new IPFSRepo(repoPath)
 
-  before((done) => {
-    series([
-      (cb) => ncp(testRepoPath, repoPath, cb),
-      (cb) => repo.open(cb)
-    ], done)
+  before(async () => {
+    await fs.copy(testRepoPath, repoPath)
+    await repo.open()
   })
 
-  after((done) => {
-    series([
-      (cb) => repo.close(cb),
-      (cb) => rimraf(repoPath, cb)
-    ], done)
+  after(async () => {
+    await repo.close()
+    await fs.remove(repoPath)
   })
 
   tests(repo)

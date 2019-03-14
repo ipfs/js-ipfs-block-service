@@ -34,19 +34,18 @@
     "chai": "^4.2.0",
     "cids": "~0.5.7",
     "dirty-chai": "^2.0.1",
+    "fs-extra": "^8.0.1",
     "ipfs-block": "~0.8.0",
-    "ipfs-repo": "~0.26.2",
+    "ipfs-repo": "~0.27.0",
     "lodash": "^4.17.11",
-    "multihashing-async": "~0.5.2",
-    "ncp": "^2.0.0",
-    "rimraf": "^2.6.3"
+    "multihashing-async": "~0.7.0"
   },
   "engines": {
     "node": ">=6.0.0",
     "npm": ">=3.0.0"
   },
   "dependencies": {
-    "async": "^2.6.2"
+    "streaming-iterables": "^4.0.2"
   },
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
