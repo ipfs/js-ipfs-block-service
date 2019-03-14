@@ -1,6 +1,6 @@
 'use strict'
 
-const asyncMap = require('async/map')
+const { map } = require('streaming-iterables')
 
 /**
  * BlockService is a hybrid block datastore. It stores data in a local
@@ -54,14 +54,13 @@ class BlockService {
    * Put a block to the underlying datastore.
    *
    * @param {Block} block
-   * @param {function(Error)} callback
-   * @returns {void}
+   * @returns {Promise}
    */
-  put (block, callback) {
+  put (block) {
     if (this.hasExchange()) {
-      this._bitswap.put(block, callback)
+      return this._bitswap.put(block)
     } else {
-      this._repo.blocks.put(block, callback)
+      return this._repo.blocks.put(block)
     }
   }
 
@@ -69,14 +68,13 @@ class BlockService {
    * Put a multiple blocks to the underlying datastore.
    *
    * @param {Array<Block>} blocks
-   * @param {function(Error)} callback
-   * @returns {void}
+   * @returns {Promise}
    */
-  putMany (blocks, callback) {
+  putMany (blocks) {
     if (this.hasExchange()) {
-      this._bitswap.putMany(blocks, callback)
+      return this._bitswap.putMany(blocks)
     } else {
-      this._repo.blocks.putMany(blocks, callback)
+      return this._repo.blocks.putMany(blocks)
     }
   }
 
@@ -84,14 +82,13 @@ class BlockService {
    * Get a block by cid.
    *
    * @param {CID} cid
-   * @param {function(Error, Block)} callback
-   * @returns {void}
+   * @returns {Promise<Block>}
    */
-  get (cid, callback) {
+  get (cid) {
     if (this.hasExchange()) {
-      this._bitswap.get(cid, callback)
+      return this._bitswap.get(cid)
     } else {
-      this._repo.blocks.get(cid, callback)
+      return this._repo.blocks.get(cid)
     }
   }
 
@@ -99,16 +96,18 @@ class BlockService {
    * Get multiple blocks back from an array of cids.
    *
    * @param {Array<CID>} cids
-   * @param {function(Error, Block)} callback
-   * @returns {void}
+   * @returns {Iterator<Block>}
    */
-  getMany (cids, callback) {
+  getMany (cids) {
     if (!Array.isArray(cids)) {
-      callback(new Error('first arg must be an array of cids'))
-    } else if (this.hasExchange()) {
-      this._bitswap.getMany(cids, callback)
+      throw new Error('first arg must be an array of cids')
+    }
+
+    if (this.hasExchange()) {
+      return this._bitswap.getMany(cids)
     } else {
-      asyncMap(cids, (cid, cb) => this._repo.blocks.get(cid, cb), callback)
+      const getRepoBlocks = map((cid) => this._repo.blocks.get(cid))
+      return getRepoBlocks(cids)
     }
   }
 
@@ -116,11 +115,10 @@ class BlockService {
    * Delete a block from the blockstore.
    *
    * @param {CID} cid
-   * @param {function(Error)} callback
-   * @return {void}
+   * @returns {Promise}
    */
-  delete (cid, callback) {
-    this._repo.blocks.delete(cid, callback)
+  delete (cid) {
+    return this._repo.blocks.delete(cid)
   }
 }
 

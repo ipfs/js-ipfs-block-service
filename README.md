@@ -72,31 +72,20 @@ const repo = new IPFSRepo('example')
 
 // create a block
 const data = new Buffer('hello world')
-multihashing(data, 'sha2-256', (err, multihash) => {
-  if (err) {
-    throw err
-  }
+const multihash = await multihashing(data, 'sha2-256')
 
-  const cid = new CID(multihash)
-  const block = new Block(data, cid)
+const cid = new CID(multihash)
+const block = new Block(data, cid)
 
-  // create a service
-  const bs = new BlockService(repo)
+// create a service
+const service = new BlockService(repo)
 
-  // add the block, then retrieve it
-  bs.put(block, (err) => {
-    if (err) {
-      throw err
-    }
-    bs.get(cid, (err, b) => {
-      if (err) {
-        throw err
-      }
-      console.log(block.data.toString() === b.data.toString())
-      // => true
-    })
-  })
-})
+// add the block, then retrieve it
+await service.put(block)
+
+const result = await service.get(cid)
+console.log(block.data.toString() === result.data.toString())
+// => true
 ```
 
 ### Browser: Browserify, Webpack, other bundlers
