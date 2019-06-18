@@ -1,6 +1,6 @@
 {
   "name": "ipfs-block-service",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "description": "JavaScript Implementation of BlockService",
   "leadMaintainer": "Volker Mische <volker.mische@gmail.com>",
   "main": "src/index.js",
@@ -49,6 +49,7 @@
   },
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
+    "Dirk McCormick <dirkmdev@gmail.com>",
     "Friedel Ziegelmayer <dignifiedquire@gmail.com>",
     "Greenkeeper <support@greenkeeper.io>",
     "Pedro Santos <pedro.santos@moxy.studio>",
