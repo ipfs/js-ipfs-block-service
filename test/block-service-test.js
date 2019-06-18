@@ -34,7 +34,7 @@ module.exports = (repo) => {
       }))
     })
 
-    describe('fetch only from local Repo', async () => {
+    describe('fetch only from local Repo', () => {
       it('store and get a block', async () => {
         const b = testBlocks[3]
 
