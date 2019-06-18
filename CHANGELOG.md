@@ -1,3 +1,18 @@
+<a name="0.16.0"></a>
+# [0.16.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.15.2...v0.16.0) (2019-06-18)
+
+
+### Chores
+
+* callbacks -> async / await ([9fb54d2](https://github.com/ipfs/js-ipfs-block-service/commit/9fb54d2))
+
+
+### BREAKING CHANGES
+
+* All places in the API that used callbacks are now replaced with async/await
+
+
+
 <a name="0.15.2"></a>
 ## [0.15.2](https://github.com/ipfs/js-ipfs-block-service/compare/v0.15.1...v0.15.2) (2018-11-08)
 
