@@ -13,9 +13,10 @@ class BlockService {
    *
    * @param {IPFSRepo} ipfsRepo
    */
-  constructor (ipfsRepo) {
+  constructor (ipfsRepo, decider) {
     this._repo = ipfsRepo
     this._bitswap = null
+    this._decider = decider
   }
 
   /**
@@ -56,7 +57,8 @@ class BlockService {
    * @param {Block} block
    * @returns {Promise}
    */
-  put (block) {
+  async put (block) {
+    if (this._decider && await !this._decider(block)) return
     if (this.hasExchange()) {
       return this._bitswap.put(block)
     } else {
@@ -70,7 +72,11 @@ class BlockService {
    * @param {Array<Block>} blocks
    * @returns {Promise}
    */
-  putMany (blocks) {
+  async putMany (blocks) {
+    if (this._decider) {
+      blocks = blocks.map(b => this._decider(b).then(allowed => allowed ? block : null))
+      blocks = (await Promise.all(blocks)).filter(x => x)
+    }
     if (this.hasExchange()) {
       return this._bitswap.putMany(blocks)
     } else {
@@ -85,6 +91,7 @@ class BlockService {
    * @returns {Promise<Block>}
    */
   get (cid) {
+    if (this._decider && !this._decider(cid)) throw new Error("Self-care error, this block is bad for you") 
     if (this.hasExchange()) {
       return this._bitswap.get(cid)
     } else {
