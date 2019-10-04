@@ -80,6 +80,17 @@ module.exports = (repo) => {
         expect(res).to.be.eql(false)
       })
 
+      it('does not delete a block it does not have', async () => {
+        const data = Buffer.from('Will not live that much ' + Date.now())
+        const cid = new CID(await multihashing(data, 'sha2-256'))
+
+        await bs.delete(cid)
+          .then(
+            () => expect.fail('Should have thrown'),
+            (err) => expect(err).to.have.property('code', 'ERR_BLOCK_NOT_FOUND')
+          )
+      })
+
       it('stores and gets lots of blocks', async function () {
         this.timeout(8 * 1000)
 
