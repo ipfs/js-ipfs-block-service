@@ -128,12 +128,12 @@ class BlockService {
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise}
    */
-  async delete (cid) {
+  async delete (cid, options) {
     if (!await this._repo.blocks.has(cid)) {
       throw errcode(new Error('blockstore: block not found'), 'ERR_BLOCK_NOT_FOUND')
     }
 
-    return this._repo.blocks.delete(cid)
+    return this._repo.blocks.delete(cid, options)
   }
 }
 
