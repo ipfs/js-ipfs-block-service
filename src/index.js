@@ -1,6 +1,7 @@
 'use strict'
 
 const { map } = require('streaming-iterables')
+const errcode = require('err-code')
 
 /**
  * BlockService is a hybrid block datastore. It stores data in a local
@@ -127,7 +128,11 @@ class BlockService {
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise}
    */
-  delete (cid, options) {
+  async delete (cid, options) {
+    if (!await this._repo.blocks.has(cid)) {
+      throw errcode(new Error('blockstore: block not found'), 'ERR_BLOCK_NOT_FOUND')
+    }
+
     return this._repo.blocks.delete(cid, options)
   }
 }

@@ -33,7 +33,8 @@ describe('aborting requests', () => {
         putMany: abortOnSignal,
         get: abortOnSignal,
         delete: abortOnSignal,
-        deleteMany: abortOnSignal
+        deleteMany: abortOnSignal,
+        has: () => true
       }
     }
     r = new BlockService(repo)
