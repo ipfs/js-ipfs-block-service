@@ -55,13 +55,15 @@ class BlockService {
    * Put a block to the underlying datastore.
    *
    * @param {Block} block
+   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise}
    */
-  put (block) {
+  put (block, options) {
     if (this.hasExchange()) {
-      return this._bitswap.put(block)
+      return this._bitswap.put(block, options)
     } else {
-      return this._repo.blocks.put(block)
+      return this._repo.blocks.put(block, options)
     }
   }
 
@@ -69,13 +71,15 @@ class BlockService {
    * Put a multiple blocks to the underlying datastore.
    *
    * @param {Array<Block>} blocks
+   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise}
    */
-  putMany (blocks) {
+  putMany (blocks, options) {
     if (this.hasExchange()) {
-      return this._bitswap.putMany(blocks)
+      return this._bitswap.putMany(blocks, options)
     } else {
-      return this._repo.blocks.putMany(blocks)
+      return this._repo.blocks.putMany(blocks, options)
     }
   }
 
@@ -83,13 +87,15 @@ class BlockService {
    * Get a block by cid.
    *
    * @param {CID} cid
+   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise<Block>}
    */
-  get (cid) {
+  get (cid, options) {
     if (this.hasExchange()) {
-      return this._bitswap.get(cid)
+      return this._bitswap.get(cid, options)
     } else {
-      return this._repo.blocks.get(cid)
+      return this._repo.blocks.get(cid, options)
     }
   }
 
@@ -97,17 +103,19 @@ class BlockService {
    * Get multiple blocks back from an array of cids.
    *
    * @param {Array<CID>} cids
+   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Iterator<Block>}
    */
-  getMany (cids) {
+  getMany (cids, options) {
     if (!Array.isArray(cids)) {
       throw new Error('first arg must be an array of cids')
     }
 
     if (this.hasExchange()) {
-      return this._bitswap.getMany(cids)
+      return this._bitswap.getMany(cids, options)
     } else {
-      const getRepoBlocks = map((cid) => this._repo.blocks.get(cid))
+      const getRepoBlocks = map((cid) => this._repo.blocks.get(cid, options))
       return getRepoBlocks(cids)
     }
   }
@@ -116,6 +124,8 @@ class BlockService {
    * Delete a block from the blockstore.
    *
    * @param {CID} cid
+   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise}
    */
   async delete (cid) {
