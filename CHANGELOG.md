@@ -1,3 +1,23 @@
+<a name="0.17.0"></a>
+# [0.17.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.16.0...v0.17.0) (2020-04-16)
+
+
+### Bug Fixes
+
+* throw if asked to delete a block we don't have ([#88](https://github.com/ipfs/js-ipfs-block-service/issues/88)) ([4ffb28c](https://github.com/ipfs/js-ipfs-block-service/commit/4ffb28c))
+
+
+### Features
+
+* support passing AbortSignals to the configured repo ([#89](https://github.com/ipfs/js-ipfs-block-service/issues/89)) ([0c5f17c](https://github.com/ipfs/js-ipfs-block-service/commit/0c5f17c))
+
+
+### BREAKING CHANGES
+
+* `bs.delete(cid)` used to ignore mystery CIDs, now it throws.
+
+
+
 <a name="0.16.0"></a>
 # [0.16.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.15.2...v0.16.0) (2019-06-18)
 
