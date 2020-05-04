@@ -147,7 +147,7 @@ class BlockService {
   deleteMany (cids, options) {
     const repo = this._repo
 
-    return this._repo.blocks.deleteMany(async function * () {
+    return this._repo.blocks.deleteMany((async function * () {
       for await (const cid of cids) {
         if (!await repo.blocks.has(cid)) {
           throw errcode(new Error('blockstore: block not found'), 'ERR_BLOCK_NOT_FOUND')
@@ -155,7 +155,7 @@ class BlockService {
 
         yield cid
       }
-    }(), options)
+    }()), options)
   }
 }
 
