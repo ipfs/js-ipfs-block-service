@@ -31,16 +31,19 @@
 
 ## Table of Contents
 
-- [Install](#install)
-  - [npm](#npm)
-- [Usage](#usage)
-  - [Node.js](#nodejs)
-  - [Example](#example)
-  - [Browser: Browserify, Webpack, other bundlers](#browser-browserify-webpack-other-bundlers)
-  - [Browser: `<script>` Tag](#browser-script-tag)
-- [API](#api)
-- [Contribute](#contribute)
-- [License](#license)
+- [IPFS Block Service](#ipfs-block-service)
+  - [Lead Maintainer](#lead-maintainer)
+  - [Table of Contents](#table-of-contents)
+  - [Install](#install)
+    - [npm](#npm)
+  - [Usage](#usage)
+    - [Node.js](#nodejs)
+    - [Example](#example)
+    - [Browser: Browserify, Webpack, other bundlers](#browser-browserify-webpack-other-bundlers)
+    - [Browser: `<script>` Tag](#browser-script-tag)
+  - [API](#api)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## Install
 
@@ -63,7 +66,7 @@ const BlockService = require('ipfs-block-service')
 
 ```js
 const BlockService = require('ipfs-block-service')
-const Block = require('ipfs-block')
+const Block = require('ipld-block')
 const multihashing = require('multihashing-async')
 const IPFSRepo = require('ipfs-repo')  // storage repo
 
