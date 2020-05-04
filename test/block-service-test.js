@@ -5,7 +5,7 @@ const chai = require('chai')
 chai.use(require('dirty-chai'))
 const expect = chai.expect
 
-const Block = require('ipfs-block')
+const Block = require('ipld-block')
 const _ = require('lodash')
 const { collect } = require('streaming-iterables')
 const CID = require('cids')
