@@ -70,7 +70,7 @@ class BlockService {
   /**
    * Put a multiple blocks to the underlying datastore.
    *
-   * @param {Array<Block>} blocks
+   * @param {AsyncIterator<Block>} blocks
    * @param {Object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise}
@@ -102,10 +102,10 @@ class BlockService {
   /**
    * Get multiple blocks back from an array of cids.
    *
-   * @param {Array<CID>} cids
+   * @param {AsyncIterator<CID>} cids
    * @param {Object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
-   * @returns {Iterator<Block>}
+   * @returns {AsyncIterator<Block>}
    */
   getMany (cids, options) {
     if (!Array.isArray(cids)) {
@@ -134,6 +134,28 @@ class BlockService {
     }
 
     return this._repo.blocks.delete(cid, options)
+  }
+
+  /**
+   * Delete multiple blocks from the blockstore.
+   *
+   * @param {AsyncIterator<CID>} cids
+   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
+   * @returns {Promise}
+   */
+  deleteMany (cids, options) {
+    const repo = this._repo
+
+    return this._repo.blocks.deleteMany((async function * () {
+      for await (const cid of cids) {
+        if (!await repo.blocks.has(cid)) {
+          throw errcode(new Error('blockstore: block not found'), 'ERR_BLOCK_NOT_FOUND')
+        }
+
+        yield cid
+      }
+    }()), options)
   }
 }
 
