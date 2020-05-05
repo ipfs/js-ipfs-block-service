@@ -1,3 +1,13 @@
+<a name="0.17.1"></a>
+## [0.17.1](https://github.com/ipfs/js-ipfs-block-service/compare/v0.17.0...v0.17.1) (2020-05-05)
+
+
+### Features
+
+* add deleteMany method ([#92](https://github.com/ipfs/js-ipfs-block-service/issues/92)) ([c57e26f](https://github.com/ipfs/js-ipfs-block-service/commit/c57e26f))
+
+
+
 <a name="0.17.0"></a>
 # [0.17.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.16.0...v0.17.0) (2020-04-16)
 
