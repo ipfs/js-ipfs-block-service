@@ -1,15 +1,15 @@
 /* eslint-env mocha */
 'use strict'
 
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-const expect = chai.expect
+const { expect } = require('aegir/utils/chai')
 
 const Block = require('ipld-block')
 const _ = require('lodash')
 const { collect } = require('streaming-iterables')
 const CID = require('cids')
 const multihashing = require('multihashing-async')
+const uint8ArrayFromString = require('uint8arrays/from-string')
+const drain = require('it-drain')
 
 const BlockService = require('../src')
 
@@ -22,10 +22,10 @@ module.exports = (repo) => {
       bs = new BlockService(repo)
 
       const data = [
-        Buffer.from('1'),
-        Buffer.from('2'),
-        Buffer.from('3'),
-        Buffer.from('A random data block')
+        uint8ArrayFromString('1'),
+        uint8ArrayFromString('2'),
+        uint8ArrayFromString('3'),
+        uint8ArrayFromString('A random data block')
       ]
 
       testBlocks = await Promise.all(data.map(async (d) => {
@@ -53,8 +53,16 @@ module.exports = (repo) => {
         }
       })
 
-      it('store many blocks', () => {
-        return bs.putMany(testBlocks)
+      it('store many blocks', async () => {
+        await drain(bs.putMany(testBlocks))
+
+        expect(
+          await Promise.all(
+            testBlocks.map(b => bs.get(b.cid))
+          )
+        ).to.deep.equal(
+          testBlocks
+        )
       })
 
       it('get many blocks through .get', async () => {
@@ -69,7 +77,7 @@ module.exports = (repo) => {
       })
 
       it('delete a block', async () => {
-        const data = Buffer.from('Will not live that much')
+        const data = uint8ArrayFromString('Will not live that much')
 
         const hash = await multihashing(data, 'sha2-256')
         const b = new Block(data, new CID(hash))
@@ -81,7 +89,7 @@ module.exports = (repo) => {
       })
 
       it('does not delete a block it does not have', async () => {
-        const data = Buffer.from('Will not live that much ' + Date.now())
+        const data = uint8ArrayFromString('Will not live that much ' + Date.now())
         const cid = new CID(await multihashing(data, 'sha2-256'))
 
         await bs.delete(cid)
@@ -92,33 +100,29 @@ module.exports = (repo) => {
       })
 
       it('deletes lots of blocks', async () => {
-        const data = Buffer.from('Will not live that much')
+        const data = uint8ArrayFromString('Will not live that much')
 
         const hash = await multihashing(data, 'sha2-256')
         const b = new Block(data, new CID(hash))
 
         await bs.put(b)
-        await bs.deleteMany([b.cid])
+        await drain(bs.deleteMany([b.cid]))
         const res = await bs._repo.blocks.has(b.cid)
-        expect(res).to.be.eql(false)
+        expect(res).to.be.false()
       })
 
       it('does not delete a blocks it does not have', async () => {
-        const data = Buffer.from('Will not live that much ' + Date.now())
+        const data = uint8ArrayFromString('Will not live that much ' + Date.now())
         const cid = new CID(await multihashing(data, 'sha2-256'))
 
-        await bs.deleteMany([cid])
-          .then(
-            () => expect.fail('Should have thrown'),
-            (err) => expect(err).to.have.property('code', 'ERR_BLOCK_NOT_FOUND')
-          )
+        await expect(drain(bs.deleteMany([cid]))).to.eventually.be.rejected().with.property('code', 'ERR_BLOCK_NOT_FOUND')
       })
 
       it('stores and gets lots of blocks', async function () {
-        this.timeout(8 * 1000)
+        this.timeout(20 * 1000)
 
         const data = _.range(1000).map((i) => {
-          return Buffer.from(`hello-${i}-${Math.random()}`)
+          return uint8ArrayFromString(`hello-${i}-${Math.random()}`)
         })
 
         const blocks = await Promise.all(data.map(async (d) => {
@@ -126,7 +130,7 @@ module.exports = (repo) => {
           return new Block(d, new CID(hash))
         }))
 
-        await bs.putMany(blocks)
+        await drain(bs.putMany(blocks))
 
         const res = await Promise.all(blocks.map(b => bs.get(b.cid)))
         expect(res).to.be.eql(blocks)
@@ -155,13 +159,13 @@ module.exports = (repo) => {
         // returns a block with a value equal to its key
         const bitswap = {
           get (cid) {
-            return new Block(Buffer.from('secret'), cid)
+            return new Block(uint8ArrayFromString('secret'), cid)
           }
         }
 
         bs.setExchange(bitswap)
 
-        const data = Buffer.from('secret')
+        const data = uint8ArrayFromString('secret')
 
         const hash = await multihashing(data, 'sha2-256')
         const block = await bs.get(new CID(hash))
@@ -178,7 +182,7 @@ module.exports = (repo) => {
         }
         bs.setExchange(bitswap)
 
-        const data = Buffer.from('secret sauce')
+        const data = uint8ArrayFromString('secret sauce')
 
         const hash = await multihashing(data, 'sha2-256')
         await bs.put(new Block(data, new CID(hash)))

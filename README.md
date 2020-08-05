@@ -69,12 +69,14 @@ const BlockService = require('ipfs-block-service')
 const Block = require('ipld-block')
 const multihashing = require('multihashing-async')
 const IPFSRepo = require('ipfs-repo')  // storage repo
+const uint8ArrayEquals = require('uint8arrays/equals')
+const uint8ArrayFromString = require('uint8arrays/from-string')
 
 // setup a repo
 const repo = new IPFSRepo('example')
 
 // create a block
-const data = new Buffer('hello world')
+const data = uint8ArrayFromString('hello world')
 const multihash = await multihashing(data, 'sha2-256')
 
 const cid = new CID(multihash)
@@ -87,7 +89,7 @@ const service = new BlockService(repo)
 await service.put(block)
 
 const result = await service.get(cid)
-console.log(block.data.toString() === result.data.toString())
+console.log(uint8ArrayEquals(block.data, result.data))
 // => true
 ```
 
