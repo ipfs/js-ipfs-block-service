@@ -1,6 +1,6 @@
 {
   "name": "ipfs-block-service",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "description": "JavaScript Implementation of BlockService",
   "leadMaintainer": "Volker Mische <volker.mische@gmail.com>",
   "main": "src/index.js",
@@ -52,11 +52,12 @@
   "contributors": [
     "David Dias <daviddias.p@gmail.com>",
     "dignifiedquire <dignifiedquire@gmail.com>",
-    "Stephen Whitmore <stephen.whitmore@gmail.com>",
     "Volker Mische <volker.mische@gmail.com>",
+    "Stephen Whitmore <stephen.whitmore@gmail.com>",
     "Alex Potsides <alex@achingbrain.net>",
     "Richard Schneider <makaretu@gmail.com>",
     "Pedro Teixeira <i@pgte.me>",
+    "Bryan Stenson <bryan.stenson@gmail.com>",
     "Dirk McCormick <dirkmdev@gmail.com>",
     "Hector Sanjuan <code@hector.link>",
     "Pedro Santos <pedro.santos@moxy.studio>",
