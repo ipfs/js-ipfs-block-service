@@ -34,7 +34,7 @@
     "aegir": "^21.8.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "cids": "^0.8.0",
+    "cids": "^1.0.0",
     "dirty-chai": "^2.0.1",
     "fs-extra": "^9.0.0",
     "ipfs-repo": "^2.1.0",
