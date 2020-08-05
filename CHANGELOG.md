@@ -1,3 +1,19 @@
+<a name="0.18.0"></a>
+# [0.18.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.17.1...v0.18.0) (2020-08-05)
+
+
+### Bug Fixes
+
+* replace node buffers with uint8arrays ([#105](https://github.com/ipfs/js-ipfs-block-service/issues/105)) ([804c5cf](https://github.com/ipfs/js-ipfs-block-service/commit/804c5cf))
+
+
+### BREAKING CHANGES
+
+* - All uses of Buffers have been replaced with Uint8Arrays
+- The ipfs-repo this module uses only returns Uint8Arrays
+
+
+
 <a name="0.17.1"></a>
 ## [0.17.1](https://github.com/ipfs/js-ipfs-block-service/compare/v0.17.0...v0.17.1) (2020-05-05)
 
