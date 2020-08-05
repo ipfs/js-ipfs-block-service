@@ -1,10 +1,7 @@
 /* eslint-env mocha */
 'use strict'
 
-const chai = require('chai')
-chai.use(require('dirty-chai'))
-chai.use(require('chai-as-promised'))
-const expect = chai.expect
+const { expect } = require('aegir/utils/chai')
 
 const { collect } = require('streaming-iterables')
 const AbortController = require('abort-controller')
