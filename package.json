@@ -38,7 +38,7 @@
     "dirty-chai": "^2.0.1",
     "fs-extra": "^9.0.0",
     "ipfs-repo": "^2.1.0",
-    "ipld-block": "^0.9.1",
+    "ipld-block": "^0.10.0",
     "lodash": "^4.17.11",
     "multihashing-async": "^0.8.1"
   },
