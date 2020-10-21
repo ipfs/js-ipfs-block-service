@@ -31,7 +31,7 @@
   "homepage": "https://github.com/ipfs/js-ipfs-block-service#readme",
   "devDependencies": {
     "abort-controller": "^3.0.0",
-    "aegir": "^22.0.0",
+    "aegir": "^28.0.2",
     "cids": "^1.0.0",
     "fs-extra": "^9.0.0",
     "ipfs-repo": "^6.0.0",
