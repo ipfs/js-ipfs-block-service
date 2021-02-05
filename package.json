@@ -46,7 +46,7 @@
     "npm": ">=3.0.0"
   },
   "dependencies": {
-    "err-code": "^2.0.0",
+    "err-code": "^3.0.0",
     "streaming-iterables": "^5.0.2"
   },
   "contributors": [
