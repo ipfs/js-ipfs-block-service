@@ -7,8 +7,11 @@ const IPFSRepo = require('ipfs-repo')
 const tests = require('./block-service-test')
 
 const idb = self.indexedDB ||
+        // @ts-ignore
         self.mozIndexedDB ||
+        // @ts-ignore
         self.webkitIndexedDB ||
+        // @ts-ignore
         self.msIndexedDB
 
 idb.deleteDatabase('ipfs')

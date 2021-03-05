@@ -3,17 +3,26 @@
 
 const { expect } = require('aegir/utils/chai')
 
-const { collect } = require('streaming-iterables')
-const AbortController = require('abort-controller')
+const all = require('it-all')
+const { AbortController } = require('abort-controller')
 
 const BlockService = require('../src')
 
+/**
+ * @typedef {import('ipfs-repo')} IPFSRepo
+ */
+
 describe('aborting requests', () => {
+  /** @type {Error} */
   let abortedErr
+  /** @type {BlockService} */
   let r
 
   beforeEach(() => {
     abortedErr = new Error('Aborted!')
+    /**
+     * @param {...any} args
+     */
     const abortOnSignal = (...args) => {
       const { signal } = args[args.length - 1]
 
@@ -24,14 +33,17 @@ describe('aborting requests', () => {
       })
     }
 
+    /** @type {IPFSRepo} */
     const repo = {
       blocks: {
         put: abortOnSignal,
+        // @ts-ignore should return async iterable
         putMany: abortOnSignal,
         get: abortOnSignal,
         delete: abortOnSignal,
+        // @ts-ignore should return async iterable
         deleteMany: abortOnSignal,
-        has: () => true
+        has: () => Promise.resolve(true)
       }
     }
     r = new BlockService(repo)
@@ -41,6 +53,7 @@ describe('aborting requests', () => {
     const controller = new AbortController()
     setTimeout(() => controller.abort(), 1)
 
+    // @ts-expect-error does not take string
     await expect(r.put('block', {
       signal: controller.signal
     })).to.eventually.rejectedWith(abortedErr)
@@ -50,6 +63,7 @@ describe('aborting requests', () => {
     const controller = new AbortController()
     setTimeout(() => controller.abort(), 1)
 
+    // @ts-expect-error does not take string array
     await expect(r.putMany(['block'], {
       signal: controller.signal
     })).to.eventually.rejectedWith(abortedErr)
@@ -59,6 +73,7 @@ describe('aborting requests', () => {
     const controller = new AbortController()
     setTimeout(() => controller.abort(), 1)
 
+    // @ts-expect-error does not take string
     await expect(r.get('cid', {
       signal: controller.signal
     })).to.eventually.rejectedWith(abortedErr)
@@ -68,7 +83,8 @@ describe('aborting requests', () => {
     const controller = new AbortController()
     setTimeout(() => controller.abort(), 1)
 
-    await expect(collect(r.getMany(['cid'], {
+    // @ts-expect-error does not take string array
+    await expect(all(r.getMany(['cid'], {
       signal: controller.signal
     }))).to.eventually.rejectedWith(abortedErr)
   })
@@ -77,6 +93,7 @@ describe('aborting requests', () => {
     const controller = new AbortController()
     setTimeout(() => controller.abort(), 1)
 
+    // @ts-expect-error does not take string
     await expect(r.delete('cid', {
       signal: controller.signal
     })).to.eventually.rejectedWith(abortedErr)
