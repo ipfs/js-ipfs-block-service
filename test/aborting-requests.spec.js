@@ -4,7 +4,7 @@
 const { expect } = require('aegir/utils/chai')
 
 const all = require('it-all')
-const { AbortController } = require('abort-controller')
+const { AbortController } = require('native-abort-controller')
 
 const BlockService = require('../src')
 
