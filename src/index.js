@@ -1,7 +1,13 @@
 'use strict'
 
-const { map } = require('streaming-iterables')
+const map = require('it-map')
 const errcode = require('err-code')
+
+/**
+ * @typedef {import('ipfs-repo')} IPFSRepo
+ * @typedef {import('ipld-block')} Block
+ * @typedef {import('cids')} CID
+ */
 
 /**
  * BlockService is a hybrid block datastore. It stores data in a local
@@ -26,8 +32,7 @@ class BlockService {
    * If the node is online all requests for blocks first
    * check locally and afterwards ask the network for the blocks.
    *
-   * @param {Bitswap} bitswap
-   * @returns {void}
+   * @param {any} bitswap
    */
   setExchange (bitswap) {
     this._bitswap = bitswap
@@ -35,8 +40,6 @@ class BlockService {
 
   /**
    * Go offline, i.e. drop the reference to bitswap.
-   *
-   * @returns {void}
    */
   unsetExchange () {
     this._bitswap = null
@@ -44,8 +47,6 @@ class BlockService {
 
   /**
    * Is the blockservice online, i.e. is bitswap present.
-   *
-   * @returns {bool}
    */
   hasExchange () {
     return this._bitswap != null
@@ -55,9 +56,9 @@ class BlockService {
    * Put a block to the underlying datastore.
    *
    * @param {Block} block
-   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
-   * @returns {Promise}
+   * @returns {Promise<Block>}
    */
   put (block, options) {
     if (this.hasExchange()) {
@@ -70,10 +71,10 @@ class BlockService {
   /**
    * Put a multiple blocks to the underlying datastore.
    *
-   * @param {AsyncIterator<Block>} blocks
-   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AsyncIterable<Block> | Iterable<Block>} blocks
+   * @param {object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
-   * @returns {Promise}
+   * @returns {AsyncIterable<Block>}
    */
   putMany (blocks, options) {
     if (this.hasExchange()) {
@@ -87,7 +88,7 @@ class BlockService {
    * Get a block by cid.
    *
    * @param {CID} cid
-   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
    * @returns {Promise<Block>}
    */
@@ -102,10 +103,10 @@ class BlockService {
   /**
    * Get multiple blocks back from an array of cids.
    *
-   * @param {AsyncIterator<CID>} cids
-   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AsyncIterable<CID> | Iterable<CID>} cids
+   * @param {object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
-   * @returns {AsyncIterator<Block>}
+   * @returns {AsyncIterable<Block>}
    */
   getMany (cids, options) {
     if (!Array.isArray(cids)) {
@@ -115,8 +116,7 @@ class BlockService {
     if (this.hasExchange()) {
       return this._bitswap.getMany(cids, options)
     } else {
-      const getRepoBlocks = map((cid) => this._repo.blocks.get(cid, options))
-      return getRepoBlocks(cids)
+      return map(cids, (cid) => this._repo.blocks.get(cid, options))
     }
   }
 
@@ -124,9 +124,8 @@ class BlockService {
    * Delete a block from the blockstore.
    *
    * @param {CID} cid
-   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
-   * @returns {Promise}
    */
   async delete (cid, options) {
     if (!await this._repo.blocks.has(cid)) {
@@ -139,10 +138,9 @@ class BlockService {
   /**
    * Delete multiple blocks from the blockstore.
    *
-   * @param {AsyncIterator<CID>} cids
-   * @param {Object} [options] -  Options is an object with the following properties
+   * @param {AsyncIterable<CID> | Iterable<CID>} cids
+   * @param {object} [options] -  Options is an object with the following properties
    * @param {AbortSignal} [options.signal] - A signal that can be used to abort any long-lived operations that are started as a result of this operation
-   * @returns {Promise}
    */
   deleteMany (cids, options) {
     const repo = this._repo

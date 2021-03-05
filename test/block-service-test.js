@@ -4,18 +4,27 @@
 const { expect } = require('aegir/utils/chai')
 
 const Block = require('ipld-block')
-const _ = require('lodash')
-const { collect } = require('streaming-iterables')
+const range = require('lodash.range')
+const all = require('it-all')
 const CID = require('cids')
 const multihashing = require('multihashing-async')
 const uint8ArrayFromString = require('uint8arrays/from-string')
 const drain = require('it-drain')
 
+/**
+ * @typedef {import('ipfs-repo')} IPFSRepo
+ */
+
 const BlockService = require('../src')
 
+/**
+ * @param {IPFSRepo} repo
+ */
 module.exports = (repo) => {
   describe('block-service', () => {
+    /** @type {BlockService} */
     let bs
+    /** @type {Block[]} */
     let testBlocks
 
     before(async () => {
@@ -72,7 +81,7 @@ module.exports = (repo) => {
 
       it('get many blocks through .getMany', async () => {
         const cids = testBlocks.map(b => b.cid)
-        const blocks = await collect(bs.getMany(cids))
+        const blocks = await all(bs.getMany(cids))
         expect(blocks).to.eql(testBlocks)
       })
 
@@ -121,7 +130,7 @@ module.exports = (repo) => {
       it('stores and gets lots of blocks', async function () {
         this.timeout(20 * 1000)
 
-        const data = _.range(1000).map((i) => {
+        const data = range(1000).map((i) => {
           return uint8ArrayFromString(`hello-${i}-${Math.random()}`)
         })
 
@@ -158,6 +167,9 @@ module.exports = (repo) => {
       it('retrieves a block through bitswap', async () => {
         // returns a block with a value equal to its key
         const bitswap = {
+          /**
+           * @param {CID} cid
+           */
           get (cid) {
             return new Block(uint8ArrayFromString('secret'), cid)
           }
@@ -174,8 +186,12 @@ module.exports = (repo) => {
       })
 
       it('puts the block through bitswap', async () => {
+        /** @type {Block[]} */
         const puts = []
         const bitswap = {
+          /**
+           * @param {Block} block
+           */
           put (block) {
             puts.push(block)
           }
