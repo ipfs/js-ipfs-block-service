@@ -1,3 +1,12 @@
+# [0.19.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.18.0...v0.19.0) (2021-03-05)
+
+
+### Features
+
+* add types ([#136](https://github.com/ipfs/js-ipfs-block-service/issues/136)) ([52f2439](https://github.com/ipfs/js-ipfs-block-service/commit/52f2439cf20e6716314aadb335bb85fe83ba9952))
+
+
+
 <a name="0.18.0"></a>
 # [0.18.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.17.1...v0.18.0) (2020-08-05)
 
