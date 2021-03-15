@@ -34,7 +34,7 @@
     "@types/fs-extra": "^9.0.8",
     "@types/lodash.range": "^3.2.6",
     "abort-controller": "^3.0.0",
-    "aegir": "^31.0.4",
+    "aegir": "^32.0.2",
     "assert": "^2.0.0",
     "cids": "^1.0.0",
     "events": "^3.3.0",
