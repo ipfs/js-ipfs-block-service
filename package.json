@@ -38,7 +38,7 @@
     "assert": "^2.0.0",
     "cids": "^1.0.0",
     "events": "^3.3.0",
-    "fs-extra": "^9.0.0",
+    "fs-extra": "^10.0.0",
     "ipfs-repo": "^9.0.0",
     "ipld-block": "^0.11.1",
     "it-all": "^1.0.5",
