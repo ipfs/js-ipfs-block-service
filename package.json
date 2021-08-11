@@ -1,6 +1,6 @@
 {
   "name": "ipfs-block-service",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "JavaScript Implementation of BlockService",
   "leadMaintainer": "Volker Mische <volker.mische@gmail.com>",
   "main": "src/index.js",
@@ -66,12 +66,12 @@
     "Richard Schneider <makaretu@gmail.com>",
     "Pedro Teixeira <i@pgte.me>",
     "Bryan Stenson <bryan.stenson@gmail.com>",
-    "Dirk McCormick <dirkmdev@gmail.com>",
+    "wanderer <mjbecze@gmail.com>",
     "Hector Sanjuan <code@hector.link>",
+    "ᴠɪᴄᴛᴏʀ ʙᴊᴇʟᴋʜᴏʟᴍ <victorbjelkholm@gmail.com>",
     "Pedro Santos <pedro.santos@moxy.studio>",
     "Richard Littauer <richard.littauer@gmail.com>",
     "Vijayee Kulkaa <vijayee.kulkaa@hushmail.com>",
-    "wanderer <mjbecze@gmail.com>",
-    "ᴠɪᴄᴛᴏʀ ʙᴊᴇʟᴋʜᴏʟᴍ <victorbjelkholm@gmail.com>"
+    "Dirk McCormick <dirkmdev@gmail.com>"
   ]
 }
