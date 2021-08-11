@@ -1,3 +1,7 @@
+## [0.19.1](https://github.com/ipfs/js-ipfs-block-service/compare/v0.19.0...v0.19.1) (2021-08-11)
+
+
+
 # [0.19.0](https://github.com/ipfs/js-ipfs-block-service/compare/v0.18.0...v0.19.0) (2021-03-05)
 
 
