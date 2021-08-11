@@ -1,3 +1,6 @@
+⛔️ DEPRECATED: This module has been merged into [ipfs](https://github.com/ipfs/js-ipfs) <!-- omit in toc -->
+======
+
 # IPFS Block Service
 
 [![](https://img.shields.io/badge/made%20by-Protocol%20Labs-blue.svg?style=flat-square)](http://ipn.io)
